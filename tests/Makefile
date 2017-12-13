@@ -1,34 +1,34 @@
-.PHONY: all clean
-.NOTPARALLEL: _prophyle_index_output*
+TESTS = $(wildcard */.)
 
-include ../conf.mk
+.PHONY: all help clean $(TESTS) parallel
 
-K=$(shell seq 2 8)
-DIFFS = $(addsuffix .txt, $(addprefix __diff., $(K)))
+SHELL=/usr/bin/env bash -eo pipefail
 
-all: $(DIFFS)
-	@for f in $^; do \
-		if [[ -s "$$f" ]]; then \
-			echo "file $$f is not empty"; \
-			exit 1; \
-		fi; \
-	done
+.SECONDARY:
 
-__diff.%.txt: _kmers.expected.%.txt _kmers.observed.%.txt
-	diff -c $^ | tee $@
+all: ## Run tests
+all: $(TESTS)
 
-_kmers.expected.%.txt: $(FA)
-	$(F2K) -i $< -k $* > $@
+help: ## Print help message
+	@echo "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s : | sort)"
 
-_kmers.observed.%.txt: _prophyle_index_output.%.txt
-	cat "$<" | (grep -B 1 '^[1-9]' || true) | (grep "#" || true) | sed 's/\#//' | sort > $@
+V=1
 
-_prophyle_index_output.%.txt: _kmers.all.%.fq
-	$(1STEP) -v -k $* $(FA) $< > $@
+parallel: ## Run tests in parallel
+	$(MAKE) -j
 
-_kmers.all.%.fq:
-	$(AK) -k $* -f fq > $@
+$(TESTS): compile
+	@echo
+	@echo "========================================="
+	@echo "$@"
+	@echo "========================================="
+	@echo
+	$(MAKE) -C $@
 
-clean:
-	rm -f _* index.fa.*
+compile: ## Compile prophyle_index
+	$(MAKE) -C ../src
 
+clean: ## Clean
+	@for a in $(TESTS); do \
+		$(MAKE) -C $$a clean; \
+	done;
