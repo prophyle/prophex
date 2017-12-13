@@ -1,5 +1,7 @@
 # ProPhyle_Index
 
+[![Build Status](https://travis-ci.org/karel-brinda/prophyle_index.svg?branch=master)](https://travis-ci.org/karel-brinda/prophyle_index)
+
 ## Prerequisities
 
 * GCC 4.8+ or equivalent
