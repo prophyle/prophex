@@ -1,6 +1,6 @@
 # ProPhyle_Index
 
-[![Build Status](https://travis-ci.org/karel-brinda/prophyle_index.svg?branch=master)](https://travis-ci.org/karel-brinda/prophyle_index)
+[![Build Status](https://travis-ci.org/prophyle/prophyle_index.svg?branch=master)](https://travis-ci.org/prophyle/prophyle_index)
 
 ## Prerequisities
 
