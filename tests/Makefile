@@ -25,7 +25,7 @@ $(TESTS): compile
 	@echo
 	$(MAKE) -C $@
 
-compile: ## Compile prophyle_index
+compile: ## Compile prophex
 	$(MAKE) -C ../src
 
 clean: ## Clean

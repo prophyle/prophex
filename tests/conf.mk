@@ -2,7 +2,7 @@ SHELL=/bin/bash -e -o pipefail
 
 .SECONDARY:
 
-IND=../../prophyle_index
+IND=../../prophex
 F2K=../fa_to_kmers.py
 
 FQ=../simulation_bacteria.1000.fq
