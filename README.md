@@ -1,6 +1,6 @@
-# ProPhyle_Index
+# ProPhex
 
-[![Build Status](https://travis-ci.org/prophyle/prophyle_index.svg?branch=master)](https://travis-ci.org/prophyle/prophyle_index)
+[![Build Status](https://travis-ci.org/prophyle/prophex.svg?branch=master)](https://travis-ci.org/prophyle/prophex)
 
 ## Prerequisities
 
@@ -11,24 +11,24 @@
 ## Getting started
 
 ```
-git clone --recursive https://github.com/salikhov-kamil/prophyle_index
-cd prophyle_index && make -j
+git clone --recursive https://github.com/prophyle/prophex
+cd prophex && make -j
 ```
 
 
 ## Issues
 
-Please use [Github issues](https://github.com/salikhov-kamil/prophyle_index/issues).
+Please use [Github issues](https://github.com/prophyle/prophex/issues).
 
 
 ## Changelog
 
-See [Releases](https://github.com/salikhov-kamil/prophyle_index/releases).
+See [Releases](https://github.com/prophyle/prophex/releases).
 
 
 ## Licence
 
-[MIT](https://github.com/salikhov-kamil/prophyle_index/blob/master/LICENSE)
+[MIT](https://github.com/prophyle/prophex/blob/master/LICENSE)
 
 
 ## Author
