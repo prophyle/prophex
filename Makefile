@@ -4,9 +4,9 @@ SHELL=/usr/bin/env bash -eo pipefail
 
 .SECONDARY:
 
-all: prophyle_index
+all: prophex
 
-prophyle_index:
+prophex:
 	$(MAKE) -C src
 
 help: ## Print help message
@@ -18,4 +18,4 @@ test:
 clean: ## Clean
 	$(MAKE) -C src clean
 	$(MAKE) -C tests clean
-	rm -f prophyle_index
+	rm -f prophex
