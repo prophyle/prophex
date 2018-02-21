@@ -29,8 +29,10 @@ static int usage()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: build     construct index\n");
-	fprintf(stderr, "         query     query reads against index\n");
+	fprintf(stderr, "Command: build         construct index\n");
+	fprintf(stderr, "         query         query reads against index\n");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "         bwtdowngrade  downgrade .bwt to the old format\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -46,9 +48,9 @@ static int usage_build(){
 	return 1;
 }
 
-static int usage_debwtupdate(){
+static int usage_bwtdowngrade(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex debwtupdate input.bwt output.bwt\n");
+	fprintf(stderr, "Usage:   prophex bwtdowngrade input.bwt output.bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -137,12 +139,12 @@ int prophex_build(int argc, char *argv[])
 	return 0;
 }
 
-int prophyle_debwtupdate(int argc, char *argv[])
+int prophyle_bwtdowngrade(int argc, char *argv[])
 {
 	if (argc < 2) {
-		return usage_debwtupdate();
+		return usage_bwtdowngrade();
 	}
-	return debwtupdate(argv[0], argv[1]);
+	return bwtdowngrade(argv[0], argv[1]);
 }
 
 int main(int argc, char *argv[])
@@ -151,7 +153,7 @@ int main(int argc, char *argv[])
 	if (argc < 2) return usage();
 	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
-	else if (strcmp(argv[1], "debwtupdate") == 0) ret = prophyle_debwtupdate(argc - 2, argv + 2);
+	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophyle_bwtdowngrade(argc - 2, argv + 2);
 	else return usage();
 
 	return ret;

@@ -78,7 +78,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	}
 }
 
-int debwtupdate(const char* bwt_input_file, const char* bwt_output_file) {
+int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file) {
 	bwtint_t i, k, n_occ;
 	uint32_t *buf;
 	bwt_t *bwt = bwt_restore_bwt(bwt_input_file);
