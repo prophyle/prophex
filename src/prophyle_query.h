@@ -1,5 +1,5 @@
 /*
-	prophyle_index query command implementation.
+	prophex query command implementation.
 	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
 	Licence: MIT
 */
@@ -35,13 +35,13 @@ typedef struct {
 typedef struct {
 	const bwaidx_t* idx;
 	const klcp_t* klcp;
-	const prophyle_index_opt_t* opt;
+	const prophex_opt_t* opt;
 	const bseq1_t* seqs;
 	prophyle_query_aux_t* aux_data;
 	int32_t seqs_cnt;
 	char** output;
 } prophyle_worker_t;
 
-void query(const char* prefix, const char* fn_fa, const prophyle_index_opt_t* opt);
+void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt);
 
 #endif //PROPHYLE_QUERY_H

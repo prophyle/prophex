@@ -1,12 +1,12 @@
 /*
-	prophyle_index main file, implements build and query commands.
+	prophex main file, implements build and query commands.
 	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
 	Licence: MIT
 	Examples:
 		build prophyle index for k = 20, suffix array and klcp simultaneously:
-			prophyle_index build -k 20 -s index.fa
+			prophex build -k 20 -s index.fa
 		query reads for k=20 using rolling window search with 10 threads, writing output in results.txt:
-			prophyle_index query -u -k 20 -t 10 index.fa reads.fq > results.txt
+			prophex query -u -k 20 -t 10 index.fa reads.fq > results.txt
 */
 
 #include <stdio.h>
@@ -24,10 +24,10 @@
 static int usage()
 {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Program: prophyle_index (alignment of k-mers)\n");
+	fprintf(stderr, "Program: prophex (alignment of k-mers)\n");
 	fprintf(stderr, "Contact: Kamil Salikhov <kamil.salikhov@univ-mlv.fr>\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophyle_index command [options]\n");
+	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Command: build     construct index\n");
 	fprintf(stderr, "         query     query reads against index\n");
@@ -37,7 +37,7 @@ static int usage()
 
 static int usage_build(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophyle_index build <prefix>\n");
+	fprintf(stderr, "Usage:   prophex build <prefix>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
@@ -48,14 +48,14 @@ static int usage_build(){
 
 static int usage_debwtupdate(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophyle_index debwtupdate input.bwt output.bwt\n");
+	fprintf(stderr, "Usage:   prophex debwtupdate input.bwt output.bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
 
 static int usage_query(int threads){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophyle_index query [options] <prefix> <in.fq>\n");
+	fprintf(stderr, "Usage:   prophex query [options] <prefix> <in.fq>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -u        use k-LCP for querying\n");
@@ -69,13 +69,13 @@ static int usage_query(int threads){
 	return 1;
 }
 
-int prophyle_index_query(int argc, char *argv[])
+int prophex_query(int argc, char *argv[])
 {
 	int c;
-	prophyle_index_opt_t *opt;
+	prophex_opt_t *opt;
 	char *prefix;
 
-	opt = prophyle_index_init_opt();
+	opt = prophex_init_opt();
 	while ((c = getopt(argc, argv, "l:psuvk:bt:r:")) >= 0) {
 		switch (c) {
 		case 'v': { opt->output_old = 1; opt->output = 0; } break;
@@ -91,7 +91,7 @@ int prophyle_index_query(int argc, char *argv[])
 		}
 	}
 	if (opt->output_old && opt->n_threads > 1) {
-		fprintf(stderr, "[prophyle_index:%s] -v option can be used only with one thread (-t 1)\n", __func__);
+		fprintf(stderr, "[prophex:%s] -v option can be used only with one thread (-t 1)\n", __func__);
 		return 1;
 	}
 
@@ -100,7 +100,7 @@ int prophyle_index_query(int argc, char *argv[])
 		return 1;
 	}
 	if ((prefix = bwa_idx_infer_prefix(argv[optind])) == 0) {
-		fprintf(stderr, "[prophyle_index:%s] fail to locate the index %s\n", __func__, argv[optind]);
+		fprintf(stderr, "[prophex:%s] fail to locate the index %s\n", __func__, argv[optind]);
 		free(opt);
 		return 1;
 	}
@@ -109,12 +109,12 @@ int prophyle_index_query(int argc, char *argv[])
 	return 0;
 }
 
-int prophyle_index_build(int argc, char *argv[])
+int prophex_build(int argc, char *argv[])
 {
 	int c;
-	prophyle_index_opt_t *opt;
+	prophex_opt_t *opt;
 	char *prefix;
-	opt = prophyle_index_init_opt();
+	opt = prophex_init_opt();
 	int sa_intv = 32;
 	while ((c = getopt(argc, argv, "si:k:")) >= 0) {
 		switch (c) {
@@ -129,7 +129,7 @@ int prophyle_index_build(int argc, char *argv[])
 		return 1;
 	}
 	if ((prefix = bwa_idx_infer_prefix(argv[optind])) == 0) {
-		fprintf(stderr, "[prophyle_index:%s] fail to locate the index %s\n", __func__, argv[optind]);
+		fprintf(stderr, "[prophex:%s] fail to locate the index %s\n", __func__, argv[optind]);
 		return 1;
 	}
 	build_index(prefix, opt, sa_intv);
@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
 {
 	int ret = 0;
 	if (argc < 2) return usage();
-	if (strcmp(argv[1], "build") == 0) ret = prophyle_index_build(argc - 1, argv + 1);
-	else if (strcmp(argv[1], "query") == 0) ret = prophyle_index_query(argc - 1, argv+1);
+	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
+	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
 	else if (strcmp(argv[1], "debwtupdate") == 0) ret = prophyle_debwtupdate(argc - 2, argv + 2);
 	else return usage();
 

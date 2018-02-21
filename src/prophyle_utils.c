@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include "prophyle_utils.h"
 
-prophyle_index_opt_t* prophyle_index_init_opt()
+prophex_opt_t* prophex_init_opt()
 {
-	prophyle_index_opt_t* o;
-	o = (prophyle_index_opt_t*)calloc(1, sizeof(prophyle_index_opt_t));
+	prophex_opt_t* o;
+	o = (prophex_opt_t*)calloc(1, sizeof(prophex_opt_t));
 	o->mode = BWA_MODE_GAPE | BWA_MODE_COMPREAD;
 	o->n_threads = 1;
 	o->trim_qual = 0;

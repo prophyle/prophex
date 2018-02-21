@@ -69,7 +69,7 @@ size_t get_positions(const bwaidx_t* idx, bwt_position_t* positions, const int q
 	uint64_t t;
 	for(t = k; t <= l; ++t) {
 		if (t - k >= MAX_POSSIBLE_SA_POSITIONS) {
-			fprintf(stderr, "[prophyle_index:%s] translation from SA-pos to seq-pos is truncated, too many (%llu) positions\n",
+			fprintf(stderr, "[prophex:%s] translation from SA-pos to seq-pos is truncated, too many (%llu) positions\n",
 				__func__, l - k + 1);
 			break;
 		}
@@ -145,7 +145,7 @@ void output_old(int* seen_nodes, const int nodes_cnt) {
 void strncat_with_check(char* str, char* str_to_append, int* str_length,
 	int str_to_append_length, int length_limit) {
 	if (*str_length >= length_limit) {
-		fprintf(stderr, "[prophyle_index:%s] too long output string, more than %d symbols\n",
+		fprintf(stderr, "[prophex:%s] too long output string, more than %d symbols\n",
 			__func__, length_limit);
 	} else {
 		strncat(str, str_to_append, length_limit - str_to_append_length);
@@ -246,7 +246,7 @@ void print_read_qual(const bseq1_t* p) {
 }
 
 prophyle_worker_t* prophyle_worker_init(const bwaidx_t* idx, int32_t seqs_cnt, const bseq1_t* seqs,
-		const prophyle_index_opt_t* opt, const klcp_t* klcp) {
+		const prophex_opt_t* opt, const klcp_t* klcp) {
 	prophyle_worker_t* prophyle_worker = malloc(1 * sizeof(prophyle_worker_t));
 	prophyle_worker->idx = idx;
 	prophyle_worker->seqs = seqs;
@@ -326,7 +326,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 	prophyle_worker_t* prophyle_worker = (prophyle_worker_t*)data;
 	const bwaidx_t* idx = prophyle_worker->idx;
 	bseq1_t seq = prophyle_worker->seqs[seq_index];
-	const prophyle_index_opt_t* opt = prophyle_worker->opt;
+	const prophex_opt_t* opt = prophyle_worker->opt;
 	const klcp_t* klcp = prophyle_worker->klcp;
 	prophyle_query_aux_t aux_data = prophyle_worker->aux_data[tid];
 	char* current_streak = aux_data.current_streak;
@@ -463,7 +463,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 }
 
 void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs,
-	const prophyle_index_opt_t* opt, const klcp_t* klcp)
+	const prophex_opt_t* opt, const klcp_t* klcp)
 {
 	extern void kt_for(int n_threads, void (*func)(void*,int,int), void* data, int n);
 	bwase_initialize();
@@ -510,7 +510,7 @@ void destroy_reads(int n_seqs, bseq1_t* seqs) {
 	free(seqs);
 }
 
-void query(const char* prefix, const char* fn_fa, const prophyle_index_opt_t* opt) {
+void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt) {
 	extern bwa_seqio_t* bwa_open_reads(int mode, const char* fn_fa);
 
 	int n_seqs;
@@ -528,7 +528,7 @@ void query(const char* prefix, const char* fn_fa, const prophyle_index_opt_t* op
 	}
 
 	if ((idx = bwa_idx_load_partial(prefix, BWA_IDX_ALL, opt->need_log, log_file)) == 0) {
-		fprintf(stderr, "[prophyle_index:%s] Couldn't load idx from %s\n", __func__, prefix);
+		fprintf(stderr, "[prophex:%s] Couldn't load idx from %s\n", __func__, prefix);
 		return;
 	}
 
@@ -580,8 +580,8 @@ void query(const char* prefix, const char* fn_fa, const prophyle_index_opt_t* op
 	}
 	total_time = realtime() - rtime;
 
-	fprintf(stderr, "[prophyle_index:%s] match time: %.2f sec\n", __func__, total_time);
-	fprintf(stderr, "[prophyle_index::%s] Processed %llu reads in %.3f CPU sec, %.3f real sec\n", __func__, total_seqs, cputime() - ctime, realtime() - rtime);
+	fprintf(stderr, "[prophex:%s] match time: %.2f sec\n", __func__, total_time);
+	fprintf(stderr, "[prophex::%s] Processed %llu reads in %.3f CPU sec, %.3f real sec\n", __func__, total_seqs, cputime() - ctime, realtime() - rtime);
 	if (opt->need_log) {
 		fprintf(log_file, "matching_time\t%.2fs\n", total_time);
 		fprintf(log_file, "reads\t%" PRId64 "\n", total_seqs);

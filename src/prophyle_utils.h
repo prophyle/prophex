@@ -1,5 +1,5 @@
 /*
-	Structure for prophyle_index options.
+	Structure for prophex options.
 	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
 	Licence: MIT
 */
@@ -29,8 +29,8 @@ typedef struct {
 	char* log_file_name;
 	int construct_sa_parallel;
 	int read_chunk_size;
-} prophyle_index_opt_t;
+} prophex_opt_t;
 
-prophyle_index_opt_t* prophyle_index_init_opt();
+prophex_opt_t* prophyle_index_init_opt();
 
 #endif //PROPHYLE_UTILS_H
