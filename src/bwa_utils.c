@@ -46,6 +46,55 @@ void bwa_idx_destroy_without_bns_name_and_anno(bwaidx_t* idx)
 	free(idx);
 }
 
+bntseq_t* bns_restore_core_ann_only(const char* ann_filename)
+{
+	char str[8192];
+	FILE* fp;
+	const char* fname;
+	bntseq_t* bns;
+	long long xx;
+	int i;
+	int scanres;
+	bns = (bntseq_t*)calloc(1, sizeof(bntseq_t));
+	{ // read .ann
+		fp = xopen(fname = ann_filename, "r");
+		scanres = fscanf(fp, "%lld%d%u", &xx, &bns->n_seqs, &bns->seed);
+		if (scanres != 3) goto badread;
+		bns->l_pac = xx;
+		bns->anns = (bntann1_t*)calloc(bns->n_seqs, sizeof(bntann1_t));
+		for (i = 0; i < bns->n_seqs; ++i) {
+			bntann1_t *p = bns->anns + i;
+			char *q = str;
+			int c;
+			// read gi and sequence name
+			scanres = fscanf(fp, "%u%s", &p->gi, str);
+			if (scanres != 2) goto badread;
+			p->name = strdup(str);
+			// read fasta comments
+			while (q - str < sizeof(str) - 1 && (c = fgetc(fp)) != '\n' && c != EOF) *q++ = c;
+			while (c != '\n' && c != EOF) c = fgetc(fp);
+			if (c == EOF) {
+				scanres = EOF;
+				goto badread;
+			}
+			*q = 0;
+			if (q - str > 1 && strcmp(str, " (null)") != 0) p->anno = strdup(str + 1); // skip leading space
+			else p->anno = strdup("");
+			// read the rest
+			scanres = fscanf(fp, "%lld%d%d", &xx, &p->len, &p->n_ambs);
+			if (scanres != 3) goto badread;
+			p->offset = xx;
+		}
+		err_fclose(fp);
+	}
+	return bns;
+badread:
+	if (EOF == scanres) {
+		err_fatal(__func__, "Error reading %s : %s\n", fname, ferror(fp) ? strerror(errno) : "Unexpected end of file");
+	}
+	err_fatal(__func__, "Parse error reading %s\n", fname);
+}
+
 bntseq_t* bns_restore_core_partial(const char* ann_filename, const char* amb_filename, const char* pac_filename)
 {
 	char str[8192];
@@ -118,6 +167,17 @@ badread:
 	err_fatal(__func__, "Parse error reading %s\n", fname);
 }
 
+bntseq_t* bns_restore_ann_only(const char* prefix)
+{
+	char ann_filename[1024];
+	FILE* fp;
+	bntseq_t* bns;
+	strcat(strcpy(ann_filename, prefix), ".ann");
+	bns = bns_restore_core_ann_only(ann_filename);
+	if (bns == 0) return 0;
+	return bns;
+}
+
 bntseq_t* bns_restore_partial(const char* prefix)
 {
 	char ann_filename[1024], amb_filename[1024], pac_filename[1024], alt_filename[1024];
@@ -129,7 +189,7 @@ bntseq_t* bns_restore_partial(const char* prefix)
 	bns = bns_restore_core_partial(ann_filename, amb_filename, pac_filename);
 	if (bns == 0) return 0;
 	if ((fp = fopen(strcat(strcpy(alt_filename, prefix), ".alt"), "r")) != 0) { // read .alt file if present
-		fprintf(stderr, "[prophex:%s] .alt file is present, something may work wrong!\n", __func__);
+		fprintf(stderr, "[prophyle_index:%s] .alt file is present, something may work wrong!\n", __func__);
 		char str[1024];
 		khash_t(str)* h;
 		int c, i, absent;
@@ -165,7 +225,7 @@ bwt_t* bwa_idx_load_bwt_with_time(const char* hint, int need_log, FILE* log_file
 	bwt_t* bwt;
 	prefix = bwa_idx_infer_prefix(hint);
 	if (prefix == 0) {
-		if (bwa_verbose >= 1) fprintf(stderr, "[prophex:%s] fail to locate the index files\n", __func__);
+		if (bwa_verbose >= 1) fprintf(stderr, "[prophyle_index:%s] fail to locate the index files\n", __func__);
 		return 0;
 	}
 	clock_t t = clock();
@@ -191,7 +251,7 @@ bwaidx_t* bwa_idx_load_partial(const char* hint, int which, int need_log, FILE* 
 	char* prefix;
 	prefix = bwa_idx_infer_prefix(hint);
 	if (prefix == 0) {
-		if (bwa_verbose >= 1) fprintf(stderr, "[prophex::%s] fail to locate the index files\n", __func__);
+		if (bwa_verbose >= 1) fprintf(stderr, "[prophyle_index::%s] fail to locate the index files\n", __func__);
 		return 0;
 	}
 	idx = calloc(1, sizeof(bwaidx_t));
@@ -217,7 +277,7 @@ bwt_t* bwa_idx_load_bwt_without_sa(const char* hint)
 	bwt_t* bwt;
 	prefix = bwa_idx_infer_prefix(hint);
 	if (prefix == 0) {
-		if (bwa_verbose >= 1) fprintf(stderr, "[prophex::%s] fail to locate the index files\n", __func__);
+		if (bwa_verbose >= 1) fprintf(stderr, "[prophyle_index::%s] fail to locate the index files\n", __func__);
 		return 0;
 	}
 	tmp = calloc(strlen(prefix) + 5, 1);

@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include "bwt.h"
 #include "prophyle_index_build.h"
 #include "klcp.h"
 #include "prophyle_utils.h"
 #include "bwa_utils.h"
 #include "utils.h"
+
+#define MAX_CHARACTERS_PER_LINE 100
 
 typedef struct {
 	klcp_t* klcp;
@@ -28,7 +31,7 @@ void* construct_sa_parallel(void* data) {
 	strcpy(fn, klcp_data->prefix);
 	strcat(fn, ".sa");
 	bwt_dump_sa(fn, klcp_data->bwt);
-	fprintf(stderr, "[prophex:%s] SA dumped\n", __func__);
+	fprintf(stderr, "[prophyle_index:%s] SA dumped\n", __func__);
 	return 0;
 }
 
@@ -36,7 +39,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	bwt_t *bwt;
 	{
 		if ((bwt = bwa_idx_load_bwt_without_sa(prefix)) == 0) {
-			fprintf(stderr, "[prophex:%s] Couldn't load idx from %s\n", __func__, prefix);
+			fprintf(stderr, "[prophyle_index:%s] Couldn't load idx from %s\n", __func__, prefix);
 			return;
 		}
 	}
@@ -51,13 +54,13 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 		pthread_t tid[2];
 		int status_klcp = pthread_create(&tid[0], NULL, construct_klcp_parallel, (void*)klcp_data);
 		int status_sa = pthread_create(&tid[1], NULL, construct_sa_parallel, (void*)klcp_data);
-		xassert(!status_klcp, "[prophex] error while creating thread for klcp parallel construction, try construction separate from sa\n");
-		xassert(!status_sa, "[prophex] error while creating thread for sa parallel construction, try construction separate from klcp\n");
-		fprintf(stderr, "[prophex] parallel construction of klcp and sa started\n");
+		xassert(!status_klcp, "[prophyle_index] error while creating thread for klcp parallel construction, try construction separate from sa\n");
+		xassert(!status_sa, "[prophyle_index] error while creating thread for sa parallel construction, try construction separate from klcp\n");
+		fprintf(stderr, "[prophyle_index] parallel construction of klcp and sa started\n");
 		int status_addr_klcp = pthread_join(tid[0], (void**)&status_addr_klcp);
 		int status_addr_sa = pthread_join(tid[1], (void**)&status_addr_sa);
-		xassert(!status_addr_klcp, "[prophex] error while klcp parallel construction, try construction separate from sa\n");
-		xassert(!status_addr_sa, "[prophex] error sa parallel construction, try construction separate from klcp\n");
+		xassert(!status_addr_klcp, "[prophyle_index] error while klcp parallel construction, try construction separate from sa\n");
+		xassert(!status_addr_sa, "[prophyle_index] error sa parallel construction, try construction separate from klcp\n");
 		klcp = klcp_data->klcp;
 	} else {
 		klcp = construct_klcp(bwt, opt->kmer_length);
@@ -70,7 +73,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	strcat(fn, kmer_length_str);
 	strcat(fn, ".klcp");
 	klcp_dump(fn, klcp);
-	fprintf(stderr, "[prophex:%s] klcp dumped\n", __func__);
+	fprintf(stderr, "[prophyle_index:%s] klcp dumped\n", __func__);
 	if (opt->construct_sa_parallel) {
 		bwt_destroy(bwt);
 	} else {
@@ -78,7 +81,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	}
 }
 
-int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file) {
+int debwtupdate(const char* bwt_input_file, const char* bwt_output_file) {
 	bwtint_t i, k, n_occ;
 	uint32_t *buf;
 	bwt_t *bwt = bwt_restore_bwt(bwt_input_file);
@@ -104,5 +107,45 @@ int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file) {
 	bwt_dump_bwt(bwt_output_file, bwt);
 	// fprintf(stderr, "after dump\n");
 	bwt_destroy(bwt);
+	return 0;
+}
+
+int bwt2fa(const char* prefix, const char* output_filename) {
+	bwt_t *bwt;
+	{
+		if ((bwt = bwa_idx_load_bwt_without_sa(prefix)) == 0) {
+			fprintf(stderr, "[prophyle_index:%s] Couldn't load idx from %s\n", __func__, prefix);
+			return 1;
+		}
+	}
+	char* seq = malloc(bwt->seq_len * sizeof(char));
+
+	bwtint_t i = 0;
+	bwtint_t bwt_pos = 0;
+	while(i < bwt->seq_len) {
+		bwtint_t new_pos = bwt_pos - (bwt_pos > bwt->primary);
+		new_pos = bwt_B0(bwt, new_pos);
+		seq[bwt->seq_len - i - 1] = "ACGT"[new_pos];
+		new_pos = bwt->L2[new_pos] + bwt_occ(bwt, bwt_pos, new_pos);
+		bwt_pos = bwt_pos == bwt->primary? 0 : new_pos;
+		i++;
+	}
+
+	bntseq_t* bns = bns_restore_ann_only(prefix);
+
+	FILE* output_file = fopen(output_filename, "w");
+	for (i = 0; i < bns->n_seqs; ++i) {
+		bntann1_t* p = bns->anns + i;
+		fprintf(output_file, ">%s\n", p->name);
+		bwtint_t position;
+		for (position = p->offset; position < p->offset + p->len; position++) {
+			fprintf(output_file, "%c", seq[position]);
+			if (position - p->offset % MAX_CHARACTERS_PER_LINE == 0 && position - p->offset > 0) {
+				fprintf(output_file, "\n");
+			}
+		}
+		fprintf(output_file, "\n");
+	}
+	fclose(output_file);
 	return 0;
 }

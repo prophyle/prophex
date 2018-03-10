@@ -1,12 +1,12 @@
 /*
-	prophex main file, implements build and query commands.
+	prophyle_index main file, implements build and query commands.
 	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
 	Licence: MIT
 	Examples:
 		build prophyle index for k = 20, suffix array and klcp simultaneously:
-			prophex build -k 20 -s index.fa
+			prophyle_index build -k 20 -s index.fa
 		query reads for k=20 using rolling window search with 10 threads, writing output in results.txt:
-			prophex query -u -k 20 -t 10 index.fa reads.fq > results.txt
+			prophyle_index query -u -k 20 -t 10 index.fa reads.fq > results.txt
 */
 
 #include <stdio.h>
@@ -24,22 +24,22 @@
 static int usage()
 {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Program: prophex (alignment of k-mers)\n");
+	fprintf(stderr, "Program: prophyle_index (alignment of k-mers)\n");
 	fprintf(stderr, "Contact: Kamil Salikhov <kamil.salikhov@univ-mlv.fr>\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex command [options]\n");
+	fprintf(stderr, "Usage:   prophyle_index command [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: build         construct index\n");
-	fprintf(stderr, "         query         query reads against index\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "         bwtdowngrade  downgrade .bwt to the old format\n");
+	fprintf(stderr, "Command: build           construct index\n");
+	fprintf(stderr, "         query           query reads against index\n");
+	fprintf(stderr, "         debwtupdate     remove OCC array from bwt file\n");
+	fprintf(stderr, "         bwt2fa          reconstruct fa file from bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
 
 static int usage_build(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex build <prefix>\n");
+	fprintf(stderr, "Usage:   prophyle_index build <prefix>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
@@ -48,16 +48,23 @@ static int usage_build(){
 	return 1;
 }
 
-static int usage_bwtdowngrade(){
+static int usage_debwtupdate(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex bwtdowngrade input.bwt output.bwt\n");
+	fprintf(stderr, "Usage:   prophyle_index debwtupdate input.bwt output.bwt\n");
+	fprintf(stderr, "\n");
+	return 1;
+}
+
+static int usage_bwt2fa(){
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage:   prophyle_index bwt2fa input.fa output.fa\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
 
 static int usage_query(int threads){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex query [options] <prefix> <in.fq>\n");
+	fprintf(stderr, "Usage:   prophyle_index query [options] <prefix> <in.fq>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -u        use k-LCP for querying\n");
@@ -66,19 +73,18 @@ static int usage_query(int threads){
 	fprintf(stderr, "         -b        print sequences and base qualities\n");
 	fprintf(stderr, "         -l STR    log file name to output statistics\n");
 	fprintf(stderr, "         -t INT    number of threads [%d]\n", threads);
-	fprintf(stderr, "         -r INT    total size of reads in one chunk [%d bp]\n", READ_CHUNK_SIZE);
 	fprintf(stderr, "\n");
 	return 1;
 }
 
-int prophex_query(int argc, char *argv[])
+int prophyle_index_query(int argc, char *argv[])
 {
 	int c;
 	prophex_opt_t *opt;
 	char *prefix;
 
 	opt = prophex_init_opt();
-	while ((c = getopt(argc, argv, "l:psuvk:bt:r:")) >= 0) {
+	while ((c = getopt(argc, argv, "l:psuvk:bt:")) >= 0) {
 		switch (c) {
 		case 'v': { opt->output_old = 1; opt->output = 0; } break;
 		case 'u': opt->use_klcp = 1; break;
@@ -88,12 +94,11 @@ int prophex_query(int argc, char *argv[])
 		case 'l': { opt->need_log = 1; opt->log_file_name = optarg; break; }
 		case 'b': opt->output_read_qual = 1; break;
 		case 't': opt->n_threads = atoi(optarg); break;
-		case 'r': opt->read_chunk_size = atoi(optarg); break;
 		default: return 1;
 		}
 	}
 	if (opt->output_old && opt->n_threads > 1) {
-		fprintf(stderr, "[prophex:%s] -v option can be used only with one thread (-t 1)\n", __func__);
+		fprintf(stderr, "[prophyle_index:%s] -v option can be used only with one thread (-t 1)\n", __func__);
 		return 1;
 	}
 
@@ -102,7 +107,7 @@ int prophex_query(int argc, char *argv[])
 		return 1;
 	}
 	if ((prefix = bwa_idx_infer_prefix(argv[optind])) == 0) {
-		fprintf(stderr, "[prophex:%s] fail to locate the index %s\n", __func__, argv[optind]);
+		fprintf(stderr, "[prophyle_index:%s] fail to locate the index %s\n", __func__, argv[optind]);
 		free(opt);
 		return 1;
 	}
@@ -111,7 +116,7 @@ int prophex_query(int argc, char *argv[])
 	return 0;
 }
 
-int prophex_build(int argc, char *argv[])
+int prophyle_index_build(int argc, char *argv[])
 {
 	int c;
 	prophex_opt_t *opt;
@@ -131,7 +136,7 @@ int prophex_build(int argc, char *argv[])
 		return 1;
 	}
 	if ((prefix = bwa_idx_infer_prefix(argv[optind])) == 0) {
-		fprintf(stderr, "[prophex:%s] fail to locate the index %s\n", __func__, argv[optind]);
+		fprintf(stderr, "[prophyle_index:%s] fail to locate the index %s\n", __func__, argv[optind]);
 		return 1;
 	}
 	build_index(prefix, opt, sa_intv);
@@ -139,21 +144,30 @@ int prophex_build(int argc, char *argv[])
 	return 0;
 }
 
-int prophyle_bwtdowngrade(int argc, char *argv[])
+int prophyle_debwtupdate(int argc, char *argv[])
 {
 	if (argc < 2) {
-		return usage_bwtdowngrade();
+		return usage_debwtupdate();
 	}
-	return bwtdowngrade(argv[0], argv[1]);
+	return debwtupdate(argv[0], argv[1]);
+}
+
+int prophyle_bwt2fa(int argc, char *argv[])
+{
+	if (argc < 2) {
+		return usage_bwt2fa();
+	}
+	return bwt2fa(argv[0], argv[1]);
 }
 
 int main(int argc, char *argv[])
 {
 	int ret = 0;
 	if (argc < 2) return usage();
-	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
-	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
-	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophyle_bwtdowngrade(argc - 2, argv + 2);
+	if (strcmp(argv[1], "build") == 0) ret = prophyle_index_build(argc - 1, argv + 1);
+	else if (strcmp(argv[1], "query") == 0) ret = prophyle_index_query(argc - 1, argv+1);
+	else if (strcmp(argv[1], "debwtupdate") == 0) ret = prophyle_debwtupdate(argc - 2, argv + 2);
+	else if (strcmp(argv[1], "bwt2fa") == 0) ret = prophyle_bwt2fa(argc - 2, argv + 2);
 	else return usage();
 
 	return ret;
