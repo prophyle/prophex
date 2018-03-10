@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
-#include "prophyle_index_build.h"
+#include "prophex_build.h"
 #include "klcp.h"
-#include "prophyle_utils.h"
+#include "prophex_utils.h"
 #include "bwa_utils.h"
 #include "utils.h"
 

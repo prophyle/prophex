@@ -45,8 +45,8 @@ clean:
 	# if BWA Makefile is present
 	test -f bwa/Makefile && $(MAKE) -C bwa clean
 
-$(PROG): bwa/libbwa.a $(AOBJS2) main.o prophyle_query.o prophyle_index_build.o klcp.o bitarray.o bwa_utils.o prophyle_utils.o contig_node_translator.o
-	$(CC) $(INCLUDES) $(CFLAGS) $(DFLAGS) $(AOBJS2) main.o prophyle_query.o prophyle_index_build.o klcp.o bitarray.o bwa_utils.o prophyle_utils.o contig_node_translator.o -o $@ -Lbwa -lbwa $(LIBS)
+$(PROG): bwa/libbwa.a $(AOBJS2) main.o prophex_query.o prophex_build.o klcp.o bitarray.o bwa_utils.o prophex_utils.o contig_node_translator.o
+	$(CC) $(INCLUDES) $(CFLAGS) $(DFLAGS) $(AOBJS2) main.o prophex_query.o prophex_build.o klcp.o bitarray.o bwa_utils.o prophex_utils.o contig_node_translator.o -o $@ -Lbwa -lbwa $(LIBS)
 
 #bwa/libbwa.a $(AOBJS2) bwtexk.o:
 bwa/libbwa.a:

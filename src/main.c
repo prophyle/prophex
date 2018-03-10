@@ -3,7 +3,7 @@
 	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
 	Licence: MIT
 	Examples:
-		build prophyle index for k = 20, suffix array and klcp simultaneously:
+		build prophex index for k = 20, suffix array and klcp simultaneously:
 			prophex build -k 20 -s index.fa
 		query reads for k=20 using rolling window search with 10 threads, writing output in results.txt:
 			prophex query -u -k 20 -t 10 index.fa reads.fq > results.txt
@@ -16,9 +16,9 @@
 #include <string.h>
 #include <stdint.h>
 #include <inttypes.h>
-#include "prophyle_query.h"
+#include "prophex_query.h"
 #include "bwa.h"
-#include "prophyle_index_build.h"
+#include "prophex_build.h"
 #include "bwa_utils.h"
 
 static int usage()
@@ -139,7 +139,7 @@ int prophex_build(int argc, char *argv[])
 	return 0;
 }
 
-int prophyle_bwtdowngrade(int argc, char *argv[])
+int prophex_bwtdowngrade(int argc, char *argv[])
 {
 	if (argc < 2) {
 		return usage_bwtdowngrade();
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 	if (argc < 2) return usage();
 	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
-	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophyle_bwtdowngrade(argc - 2, argv + 2);
+	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophex_bwtdowngrade(argc - 2, argv + 2);
 	else return usage();
 
 	return ret;

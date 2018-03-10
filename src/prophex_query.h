@@ -4,15 +4,15 @@
 	Licence: MIT
 */
 
-#ifndef PROPHYLE_QUERY_H
-#define PROPHYLE_QUERY_H
+#ifndef PROPHEX_QUERY_H
+#define PROPHEX_QUERY_H
 
 #include <stdint.h>
 #include "bwt.h"
 #include "bwtaln.h"
 #include "bwa.h"
 #include "klcp.h"
-#include "prophyle_utils.h"
+#include "prophex_utils.h"
 
 typedef struct {
 	uint64_t position;
@@ -30,18 +30,18 @@ typedef struct {
 	int8_t* seen_nodes_marks;
 	int rids_computations;
 	int using_prev_rids;
-} prophyle_query_aux_t;
+} prophex_query_aux_t;
 
 typedef struct {
 	const bwaidx_t* idx;
 	const klcp_t* klcp;
 	const prophex_opt_t* opt;
 	const bseq1_t* seqs;
-	prophyle_query_aux_t* aux_data;
+	prophex_query_aux_t* aux_data;
 	int32_t seqs_cnt;
 	char** output;
-} prophyle_worker_t;
+} prophex_worker_t;
 
 void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt);
 
-#endif //PROPHYLE_QUERY_H
+#endif //PROPHEX_QUERY_H
