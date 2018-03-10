@@ -24,12 +24,7 @@ _kmers.observed.%.txt: _prophyle_index_output.%.txt
 	cat "$<" | (grep -B 1 '^[1-9]' || true) | (grep "#" || true) | sed 's/\#//' | sort > $@
 
 _prophyle_index_output.%.txt: _kmers.all.%.fq
-	$(BWA) fa2pac $(FA) $(FA)
-	$(BWA) pac2bwtgen $(addsuffix .pac, $(FA)) $(addsuffix .bwt, $(FA)) > /dev/null
-	$(BWA) bwtupdate $(addsuffix .bwt, $(FA))
-	$(BWA) bwt2sa $(addsuffix .bwt, $(FA)) $(addsuffix .sa, $(FA))
-	$(IND) build -k $* $(FA) 
-	$(IND) query -k $* -v $(FA) $< > $@
+	$(1STEP) -v -k $* $(FA) $< > $@
 
 _kmers.all.%.fq:
 	$(AK) -k $* -f fq > $@

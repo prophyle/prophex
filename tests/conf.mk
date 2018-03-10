@@ -9,6 +9,7 @@ AK=../all_kmers.py
 
 FQ=../simulation_bacteria.1000.fq
 FA=index.fa
+1STEP=../1step_match.py
 
 d=$(shell pwd)
 $(info )
