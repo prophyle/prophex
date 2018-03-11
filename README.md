@@ -56,7 +56,12 @@ Options: -k INT    length of k-mer
 Usage:   prophex bwtdowngrade input.bwt output.bwt
 ```
 
+# Quick example
 
+## Create BWA index for fasta:
+
+```
+./bwa in
 
 ## Issues
 

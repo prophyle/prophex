@@ -31,7 +31,7 @@ static int usage()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Command: build         construct index\n");
 	fprintf(stderr, "         query         query reads against index\n");
-	fprintf(stderr, "         bwtdowngrade  downgrade .bwt to the old format\n");
+	fprintf(stderr, "         bwtdowngrade  downgrade .bwt to the old more compact format without OCC array\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
