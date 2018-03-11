@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/prophyle/prophex.svg?branch=master)](https://travis-ci.org/prophyle/prophex)
 
+We introduce ProPhyle Index, a BWT-index based software for fast *k*-mer matching. It uses BWA[@BWA] as BWT-index implementation. ProPhyle Index is designed as a core computational part of [ProPhyle](https://prophyle.github.io), a phylogeny-based metagenomic classifier allowing fast and accurate read assignment.
+
 ## Prerequisities
 
 * GCC 4.8+ or equivalent
@@ -58,10 +60,23 @@ Usage:   prophex bwtdowngrade input.bwt output.bwt
 
 # Quick example
 
-## Create BWA index for fasta:
+## Create BWA index for index.fa:
 
 ```
-./bwa in
+./bwa index index.fa
+```
+
+## Create ProPhex index upon BWA index for k=25:
+
+```
+./prophex build -k 25 index.fa
+```
+
+## Query reads from reads.fq for k=25 using kLCP array with 4 threads:
+
+```
+./prophex query -k 25 -u -t 4 index.fa index.fq
+```
 
 ## Issues
 
