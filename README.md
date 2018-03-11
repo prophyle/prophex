@@ -95,4 +95,4 @@ See [Releases](https://github.com/prophyle/prophex/releases).
 
 ## Author
 
-Kamil Salikhov \<kamil.salikhov@univ-mlv.fr\>
+Kamil Salikhov \<salikhov.kamil@gmail.com\>
