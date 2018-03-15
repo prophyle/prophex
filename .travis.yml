@@ -1,7 +1,4 @@
-language: python
-
-python:
-    - "3.5"
+language: cpp
 
 cache:
   - apt: true
@@ -18,10 +15,12 @@ matrix:
         - sudo apt-get install g++-4.8 zlib1g-dev
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
+      script:
+        - make
+        - make test
 
     - os: osx
       compiler: clang-3.7
-
-script:
-  - make test
+      script:
+        - make
 
