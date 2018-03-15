@@ -4,12 +4,12 @@
   Licence: MIT
 */
 
-#ifndef PROPHYLE_INDEX_BUILD_H
-#define PROPHYLE_INDEX_BUILD_H
+#ifndef PROPHEX_BUILD_H
+#define PROPHEX_BUILD_H
 
-#include "prophyle_utils.h"
+#include "prophex_utils.h"
 
 void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv);
 int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file);
 
-#endif //PROPHYLE_INDEX_BUILD_H
+#endif //PROPHEX_BUILD_H

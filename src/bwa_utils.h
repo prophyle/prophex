@@ -9,7 +9,7 @@
 
 #include "bwt.h"
 #include "bwa.h"
-#include "prophyle_utils.h"
+#include "prophex_utils.h"
 
 void bwa_destroy_unused_fields(bwaidx_t* idx);
 void bns_destroy_without_names_and_anno(bntseq_t* bns);

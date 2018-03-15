@@ -4,8 +4,8 @@
 	Licence: MIT
 */
 
-#ifndef PROPHYLE_UTILS_H
-#define PROPHYLE_UTILS_H
+#ifndef PROPHEX_UTILS_H
+#define PROPHEX_UTILS_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,4 +33,4 @@ typedef struct {
 
 prophex_opt_t* prophex_init_opt();
 
-#endif //PROPHYLE_UTILS_H
+#endif //PROPHEX_UTILS_H

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <inttypes.h>
-#include "prophyle_query.h"
+#include "prophex_query.h"
 #include "utils.h"
 #include "bwa.h"
 #include "bwase.h"
@@ -245,90 +245,90 @@ void print_read_qual(const bseq1_t* p) {
 	}
 }
 
-prophyle_worker_t* prophyle_worker_init(const bwaidx_t* idx, int32_t seqs_cnt, const bseq1_t* seqs,
+prophex_worker_t* prophex_worker_init(const bwaidx_t* idx, int32_t seqs_cnt, const bseq1_t* seqs,
 		const prophex_opt_t* opt, const klcp_t* klcp) {
-	prophyle_worker_t* prophyle_worker = malloc(1 * sizeof(prophyle_worker_t));
-	prophyle_worker->idx = idx;
-	prophyle_worker->seqs = seqs;
-	prophyle_worker->opt = opt;
-	prophyle_worker->klcp = klcp;
-	prophyle_worker->aux_data = malloc(opt->n_threads * sizeof(prophyle_query_aux_t));
+	prophex_worker_t* prophex_worker = malloc(1 * sizeof(prophex_worker_t));
+	prophex_worker->idx = idx;
+	prophex_worker->seqs = seqs;
+	prophex_worker->opt = opt;
+	prophex_worker->klcp = klcp;
+	prophex_worker->aux_data = malloc(opt->n_threads * sizeof(prophex_query_aux_t));
 	int tid;
 	for (tid = 0; tid < opt->n_threads; ++tid) {
-		prophyle_worker->aux_data[tid].positions = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(bwt_position_t));
-		prophyle_worker->aux_data[tid].all_streaks = malloc(MAX_STREAK_LENGTH * sizeof(char));
-		prophyle_worker->aux_data[tid].current_streak = malloc(MAX_STREAK_LENGTH * sizeof(char));
-		prophyle_worker->aux_data[tid].seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
-		prophyle_worker->aux_data[tid].prev_seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
-		prophyle_worker->aux_data[tid].seen_nodes_marks = malloc(idx->bns->n_seqs * sizeof(int8_t));
+		prophex_worker->aux_data[tid].positions = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(bwt_position_t));
+		prophex_worker->aux_data[tid].all_streaks = malloc(MAX_STREAK_LENGTH * sizeof(char));
+		prophex_worker->aux_data[tid].current_streak = malloc(MAX_STREAK_LENGTH * sizeof(char));
+		prophex_worker->aux_data[tid].seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
+		prophex_worker->aux_data[tid].prev_seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
+		prophex_worker->aux_data[tid].seen_nodes_marks = malloc(idx->bns->n_seqs * sizeof(int8_t));
 		int index;
 		for(index = 0; index < idx->bns->n_seqs; ++index) {
-			prophyle_worker->aux_data[tid].seen_nodes_marks[index] = 0;
+			prophex_worker->aux_data[tid].seen_nodes_marks[index] = 0;
 		}
-		prophyle_worker->aux_data[tid].rids_computations = 0;
-		prophyle_worker->aux_data[tid].using_prev_rids = 0;
+		prophex_worker->aux_data[tid].rids_computations = 0;
+		prophex_worker->aux_data[tid].using_prev_rids = 0;
 	}
-	prophyle_worker->seqs_cnt = seqs_cnt;
-	prophyle_worker->output = malloc(seqs_cnt * sizeof(char*));
+	prophex_worker->seqs_cnt = seqs_cnt;
+	prophex_worker->output = malloc(seqs_cnt * sizeof(char*));
 	int i = 0;
 	for (i = 0; i < seqs_cnt; ++i) {
-		prophyle_worker->output[i] = NULL;
+		prophex_worker->output[i] = NULL;
 	}
-	return prophyle_worker;
+	return prophex_worker;
 }
 
-void prophyle_aux_data_destroy(prophyle_query_aux_t* prophyle_query_aux_data) {
-	if (prophyle_query_aux_data->positions) {
-		free(prophyle_query_aux_data->positions);
+void prophex_aux_data_destroy(prophex_query_aux_t* prophex_query_aux_data) {
+	if (prophex_query_aux_data->positions) {
+		free(prophex_query_aux_data->positions);
 	}
-	if (prophyle_query_aux_data->all_streaks) {
-		free(prophyle_query_aux_data->all_streaks);
+	if (prophex_query_aux_data->all_streaks) {
+		free(prophex_query_aux_data->all_streaks);
 	}
-	if (prophyle_query_aux_data->current_streak) {
-		free(prophyle_query_aux_data->current_streak);
+	if (prophex_query_aux_data->current_streak) {
+		free(prophex_query_aux_data->current_streak);
 	}
-	if (prophyle_query_aux_data->seen_nodes) {
-		free(prophyle_query_aux_data->seen_nodes);
+	if (prophex_query_aux_data->seen_nodes) {
+		free(prophex_query_aux_data->seen_nodes);
 	}
-	if (prophyle_query_aux_data->prev_seen_nodes) {
-		free(prophyle_query_aux_data->prev_seen_nodes);
+	if (prophex_query_aux_data->prev_seen_nodes) {
+		free(prophex_query_aux_data->prev_seen_nodes);
 	}
-	if (prophyle_query_aux_data->seen_nodes_marks) {
-		free(prophyle_query_aux_data->seen_nodes_marks);
+	if (prophex_query_aux_data->seen_nodes_marks) {
+		free(prophex_query_aux_data->seen_nodes_marks);
 	}
 }
 
-void prophyle_worker_destroy(prophyle_worker_t* prophyle_worker) {
-	if (!prophyle_worker) {
+void prophex_worker_destroy(prophex_worker_t* prophex_worker) {
+	if (!prophex_worker) {
 		return;
 	}
 	int i;
-	for (i = 0; i < prophyle_worker->opt->n_threads; ++i) {
-		prophyle_aux_data_destroy(&prophyle_worker->aux_data[i]);
+	for (i = 0; i < prophex_worker->opt->n_threads; ++i) {
+		prophex_aux_data_destroy(&prophex_worker->aux_data[i]);
 	}
-	if (prophyle_worker->aux_data) {
-		free(prophyle_worker->aux_data);
+	if (prophex_worker->aux_data) {
+		free(prophex_worker->aux_data);
 	}
-	if (prophyle_worker->output) {
-		for (i = 0; i < prophyle_worker->seqs_cnt; ++i) {
-			if (prophyle_worker->output[i]) {
-				free(prophyle_worker->output[i]);
+	if (prophex_worker->output) {
+		for (i = 0; i < prophex_worker->seqs_cnt; ++i) {
+			if (prophex_worker->output[i]) {
+				free(prophex_worker->output[i]);
 		  }
 		}
-		if (prophyle_worker->output) {
-			free(prophyle_worker->output);
+		if (prophex_worker->output) {
+			free(prophex_worker->output);
 		}
 	}
-	free(prophyle_worker);
+	free(prophex_worker);
 }
 
 void process_sequence(void* data, int seq_index, int tid) {
-	prophyle_worker_t* prophyle_worker = (prophyle_worker_t*)data;
-	const bwaidx_t* idx = prophyle_worker->idx;
-	bseq1_t seq = prophyle_worker->seqs[seq_index];
-	const prophex_opt_t* opt = prophyle_worker->opt;
-	const klcp_t* klcp = prophyle_worker->klcp;
-	prophyle_query_aux_t aux_data = prophyle_worker->aux_data[tid];
+	prophex_worker_t* prophex_worker = (prophex_worker_t*)data;
+	const bwaidx_t* idx = prophex_worker->idx;
+	bseq1_t seq = prophex_worker->seqs[seq_index];
+	const prophex_opt_t* opt = prophex_worker->opt;
+	const klcp_t* klcp = prophex_worker->klcp;
+	prophex_query_aux_t aux_data = prophex_worker->aux_data[tid];
 	char* current_streak = aux_data.current_streak;
 	char* all_streaks = aux_data.all_streaks;
 	int32_t* seen_nodes = aux_data.seen_nodes;
@@ -359,8 +359,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 	int ambiguous_streak_just_ended = 0;
 	if (start_pos + opt->kmer_length > seq.l_seq) {
 		if (opt->output) {
-			prophyle_worker->output[seq_index] = malloc(5 * sizeof(char));
-			strncpy(prophyle_worker->output[seq_index], "0:0", 5);
+			prophex_worker->output[seq_index] = malloc(5 * sizeof(char));
+			strncpy(prophex_worker->output[seq_index], "0:0", 5);
 		}
 	} else {
 		int index = 0;
@@ -456,8 +456,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 		}
 		if (opt->output) {
 			size_t all_streaks_length = strlen(all_streaks);
-			prophyle_worker->output[seq_index] = malloc((all_streaks_length + 1) * sizeof(char));
-			strncpy(prophyle_worker->output[seq_index], all_streaks, all_streaks_length + 1);
+			prophex_worker->output[seq_index] = malloc((all_streaks_length + 1) * sizeof(char));
+			strncpy(prophex_worker->output[seq_index], all_streaks, all_streaks_length + 1);
 		}
 	}
 }
@@ -467,14 +467,14 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs,
 {
 	extern void kt_for(int n_threads, void (*func)(void*,int,int), void* data, int n);
 	bwase_initialize();
-	prophyle_worker_t* prophyle_worker = prophyle_worker_init(idx, n_seqs, seqs, opt, klcp);
-	kt_for(opt->n_threads, process_sequence, prophyle_worker, n_seqs);
+	prophex_worker_t* prophex_worker = prophex_worker_init(idx, n_seqs, seqs, opt, klcp);
+	kt_for(opt->n_threads, process_sequence, prophex_worker, n_seqs);
 	int i;
 	for (i = 0; i < n_seqs; ++i) {
 		bseq1_t* seq = seqs + i;
 		if (opt->output) {
 			fprintf(stdout, "U\t%s\t0\t%d\t", seq->name, seq->l_seq);
-			print_streaks(prophyle_worker->output[i]);
+			print_streaks(prophex_worker->output[i]);
 			if (opt->output_read_qual) {
 				fprintf(stdout, "\t");
 				print_read(seq);
@@ -484,7 +484,7 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs,
 			fprintf(stdout, "\n");
 		}
 	}
-	prophyle_worker_destroy(prophyle_worker);
+	prophex_worker_destroy(prophex_worker);
 }
 
 void destroy_reads(int n_seqs, bseq1_t* seqs) {
