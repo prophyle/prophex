@@ -31,7 +31,7 @@ void* construct_sa_parallel(void* data) {
 	strcpy(fn, klcp_data->prefix);
 	strcat(fn, ".sa");
 	bwt_dump_sa(fn, klcp_data->bwt);
-	fprintf(stderr, "[prophyle_index:%s] SA dumped\n", __func__);
+	fprintf(stderr, "[prophex:%s] SA dumped\n", __func__);
 	return 0;
 }
 
@@ -39,7 +39,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	bwt_t *bwt;
 	{
 		if ((bwt = bwa_idx_load_bwt_without_sa(prefix)) == 0) {
-			fprintf(stderr, "[prophyle_index:%s] Couldn't load idx from %s\n", __func__, prefix);
+			fprintf(stderr, "[prophex:%s] Couldn't load idx from %s\n", __func__, prefix);
 			return;
 		}
 	}
@@ -54,13 +54,13 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 		pthread_t tid[2];
 		int status_klcp = pthread_create(&tid[0], NULL, construct_klcp_parallel, (void*)klcp_data);
 		int status_sa = pthread_create(&tid[1], NULL, construct_sa_parallel, (void*)klcp_data);
-		xassert(!status_klcp, "[prophyle_index] error while creating thread for klcp parallel construction, try construction separate from sa\n");
-		xassert(!status_sa, "[prophyle_index] error while creating thread for sa parallel construction, try construction separate from klcp\n");
-		fprintf(stderr, "[prophyle_index] parallel construction of klcp and sa started\n");
+		xassert(!status_klcp, "[prophex] error while creating thread for klcp parallel construction, try construction separate from sa\n");
+		xassert(!status_sa, "[prophex] error while creating thread for sa parallel construction, try construction separate from klcp\n");
+		fprintf(stderr, "[prophex] parallel construction of klcp and sa started\n");
 		int status_addr_klcp = pthread_join(tid[0], (void**)&status_addr_klcp);
 		int status_addr_sa = pthread_join(tid[1], (void**)&status_addr_sa);
-		xassert(!status_addr_klcp, "[prophyle_index] error while klcp parallel construction, try construction separate from sa\n");
-		xassert(!status_addr_sa, "[prophyle_index] error sa parallel construction, try construction separate from klcp\n");
+		xassert(!status_addr_klcp, "[prophex] error while klcp parallel construction, try construction separate from sa\n");
+		xassert(!status_addr_sa, "[prophex] error sa parallel construction, try construction separate from klcp\n");
 		klcp = klcp_data->klcp;
 	} else {
 		klcp = construct_klcp(bwt, opt->kmer_length);
@@ -73,7 +73,7 @@ void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	strcat(fn, kmer_length_str);
 	strcat(fn, ".klcp");
 	klcp_dump(fn, klcp);
-	fprintf(stderr, "[prophyle_index:%s] klcp dumped\n", __func__);
+	fprintf(stderr, "[prophex:%s] klcp dumped\n", __func__);
 	if (opt->construct_sa_parallel) {
 		bwt_destroy(bwt);
 	} else {
@@ -114,7 +114,7 @@ int bwt2fa(const char* prefix, const char* output_filename) {
 	bwt_t *bwt;
 	{
 		if ((bwt = bwa_idx_load_bwt_without_sa(prefix)) == 0) {
-			fprintf(stderr, "[prophyle_index:%s] Couldn't load idx from %s\n", __func__, prefix);
+			fprintf(stderr, "[prophex:%s] Couldn't load idx from %s\n", __func__, prefix);
 			return 1;
 		}
 	}
