@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "bwa.h"
 #include "kstring.h"
-#include "prophyle_utils.h"
+#include "prophex_utils.h"
 #include "khash.h"
 #include "contig_node_translator.h"
 
