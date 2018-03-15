@@ -4,9 +4,11 @@ SHELL=/usr/bin/env bash -eo pipefail
 
 .SECONDARY:
 
+DEPS= $(wildcard src/*.h) $(wildcard src/*.c) $(wildcard src/bwa/.*.h) $(wildcard src/bwa/*.c)
+
 all: prophex
 
-prophex:
+prophex: $(DEPS)
 	$(MAKE) -C src
 
 help: ## Print help message
