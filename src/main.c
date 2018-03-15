@@ -30,10 +30,10 @@ static int usage()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: build         construct index\n");
-	fprintf(stderr, "         query         query reads against index\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "         bwtdowngrade  downgrade .bwt to the old format\n");
+	fprintf(stderr, "Command: build           construct index\n");
+	fprintf(stderr, "         query           query reads against index\n");
+	fprintf(stderr, "         bwtdowngrade    remove OCC array from bwt file\n");
+	fprintf(stderr, "         bwt2fa          reconstruct fa file from bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -49,9 +49,16 @@ static int usage_build(){
 	return 1;
 }
 
-static int usage_bwtdowngrade(){
+static int usage_bwtdowngrade() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex bwtdowngrade input.bwt output.bwt\n");
+	fprintf(stderr, "\n");
+	return 1;
+}
+
+static int usage_bwt2fa(){
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage:   prophex bwt2fa input.fa output.fa\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -67,7 +74,6 @@ static int usage_query(int threads){
 	fprintf(stderr, "         -b        print sequences and base qualities\n");
 	fprintf(stderr, "         -l STR    log file name to output statistics\n");
 	fprintf(stderr, "         -t INT    number of threads [%d]\n", threads);
-	fprintf(stderr, "         -r INT    total size of reads in one chunk [%d bp]\n", READ_CHUNK_SIZE);
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -79,7 +85,7 @@ int prophex_query(int argc, char *argv[])
 	char *prefix;
 
 	opt = prophex_init_opt();
-	while ((c = getopt(argc, argv, "l:psuvk:bt:r:")) >= 0) {
+	while ((c = getopt(argc, argv, "l:psuvk:bt:")) >= 0) {
 		switch (c) {
 		case 'v': { opt->output_old = 1; opt->output = 0; } break;
 		case 'u': opt->use_klcp = 1; break;
@@ -89,7 +95,6 @@ int prophex_query(int argc, char *argv[])
 		case 'l': { opt->need_log = 1; opt->log_file_name = optarg; break; }
 		case 'b': opt->output_read_qual = 1; break;
 		case 't': opt->n_threads = atoi(optarg); break;
-		case 'r': opt->read_chunk_size = atoi(optarg); break;
 		default: return 1;
 		}
 	}
@@ -148,6 +153,14 @@ int prophex_bwtdowngrade(int argc, char *argv[])
 	return bwtdowngrade(argv[0], argv[1]);
 }
 
+int prophex_bwt2fa(int argc, char *argv[])
+{
+	if (argc < 2) {
+		return usage_bwt2fa();
+	}
+	return bwt2fa(argv[0], argv[1]);
+}
+
 int main(int argc, char *argv[])
 {
 	int ret = 0;
@@ -155,6 +168,7 @@ int main(int argc, char *argv[])
 	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
 	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophex_bwtdowngrade(argc - 2, argv + 2);
+	else if (strcmp(argv[1], "bwt2fa") == 0) ret = prophex_bwt2fa(argc - 2, argv + 2);
 	else return usage();
 
 	return ret;
