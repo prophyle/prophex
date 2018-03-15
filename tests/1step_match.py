@@ -5,7 +5,6 @@ import sys
 import os
 import datetime
 import subprocess
-import psutil
 import time
 
 log_file = None
@@ -89,34 +88,17 @@ def run_safe(command, output_fn=None, output_fo=None, err_msg=None, thr_exc=True
     else:
         p = subprocess.Popen("/bin/bash -e -o pipefail -c '{}'".format(command_str), shell=True, stdout=out_fo)
 
-    ps_p = psutil.Process(p.pid)
-
-    max_rss = 0
-    error_code = None
-    while error_code is None:
-        try:
-            max_rss = max(max_rss, ps_p.memory_info().rss)
-        except (psutil.NoSuchProcess, psutil.ZombieProcess, psutil.AccessDenied, OSError, IOError):
-            pass
-        #except psutil.NoSuchProcess as e:
-        #    print("[prophylelib] Warning: psutil - NoSuchProcess (pid: {}, name: {}, msg: {})".format(e.pid, e.name, e.msg), file=sys.stderr)
-
-        # wait 0.2 s
-        time.sleep(0.2)
-        error_code = p.poll()
-
-    out_fo.flush()
-
-    mem_mb = round(max_rss / (1024 * 1024.0), 1)
+    stdout, stderr = p.communicate()
+    error_code = p.returncode
 
     if output_fn is not None:
         out_fo.close()
 
     if error_code == 0 or error_code == 141:
         if not silent:
-            message("Finished ({} MB used): {}".format(mem_mb, command_str))
+            message("Finished")
     else:
-        message("Unfinished, an error occurred (error code {}, {} MB used): {}".format(error_code, mem_mb, command_str))
+        message("Unfinished, an error occurred (error code {}): {}".format(error_code, command_str))
 
         if err_msg is not None:
             print('Error: {}'.format(err_msg), file=sys.stderr)
