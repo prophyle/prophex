@@ -1,5 +1,12 @@
 #! /usr/bin/env python3
 
+"""Single-command ProPhex wrapper.
+
+Author: Karel Brinda <kbrinda@hsph.harvard.edu>
+
+Licence: MIT
+"""
+
 import argparse
 import sys
 import os
@@ -127,7 +134,7 @@ def query(fa, fq, k, u=False, v=False, t=1):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Single-command prophyle_index matching.')
+    parser = argparse.ArgumentParser(description='Single-command ProPhex matching.')
     parser.add_argument(
         '-k',
         type=int,
