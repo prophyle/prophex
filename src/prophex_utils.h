@@ -31,6 +31,6 @@ typedef struct {
 	int read_chunk_size;
 } prophex_opt_t;
 
-prophex_opt_t* prophex_index_init_opt();
+prophex_opt_t* prophex_init_opt();
 
 #endif //PROPHEX_UTILS_H

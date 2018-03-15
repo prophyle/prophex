@@ -24,8 +24,9 @@
 static int usage()
 {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Program: prophex (alignment of k-mers)\n");
-	fprintf(stderr, "Contact: Kamil Salikhov <kamil.salikhov@univ-mlv.fr>\n");
+	fprintf(stderr, "Program: prophex (a lossless k-mer index)\n");
+	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
+	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
