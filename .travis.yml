@@ -15,7 +15,6 @@ matrix:
         - sudo apt-get install g++-4.8 zlib1g-dev
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
-        - pip install psutil
 
     - os: osx
       compiler: clang-3.7
