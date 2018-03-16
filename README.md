@@ -13,7 +13,7 @@ We introduce ProPhyle Index, a BWT-index based software for fast *k*-mer matchin
 ## Getting started
 
 ```
-git clone --recursive https://github.com/prophyle/prophex
+git clone https://github.com/prophyle/prophex
 cd prophex && make -j
 ```
 
