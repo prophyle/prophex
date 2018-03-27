@@ -87,13 +87,13 @@ Matches are reported in an extended
 [Kraken format](http://ccb.jhu.edu/software/kraken/MANUAL.html#output-format).
 ProPhex produces a tab-delimited file with the following columns:
 
-1. Category (unused, ‘U’ as a legacy value)
+1. Category (unused, `U` as a legacy value)
 2. Sequence name
-3. Final decision (unused, ‘0’ as a legacy value)
+3. Final decision (unused, `0` as a legacy value)
 4. Sequence length
 5. Assigned k-mers. Space-delimited list of blocks with the same assignment of
-   the following format: comma-delimited list of sets (or ‚A‘ for ambiguous, or
-   `0` for no matches), colon, length. Example: „2157,393595:1 393595:1 0:16"
+   the following format: comma-delimited list of sets (or `A` for ambiguous, or
+   `0` for no matches), colon, length. Example: `2157,393595:1 393595:1 0:16`
 6. Bases (optional)
 7. Base qualities (optional)
 
