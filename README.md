@@ -93,7 +93,7 @@ ProPhex produces a tab-delimited file with the following columns:
 4. Sequence length
 5. Assigned k-mers. Space-delimited list of k-mer blocks with the same assignments. The list is of
    the following format: comma-delimited list of sets (or `A` for ambiguous, or
-   `0` for no matches), colon, length. Example: `2157,393595:1 393595:1 0:16` (the first k-mer assigned to 2157 and 393595, the second k-mer assigned to 393595, the other 16 k-mers unassigned)
+   `0` for no matches), colon, length. Example: `2157,393595:1 393595:1 0:16` (the first k-mer assigned to the nodes `2157` and `393595`, the second k-mer assigned to `393595`, the subsequent 16 k-mers unassigned)
 6. Bases (optional)
 7. Base qualities (optional)
 
