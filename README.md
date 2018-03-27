@@ -119,7 +119,7 @@ See [Releases](https://github.com/prophyle/prophex/releases).
 
 ## Licence
 
-[MIT](https://github.com/prophyle/prophex/blob/master/LICENSE)
+[MIT](https://github.com/prophyle/prophex/blob/master/LICENSE.txt)
 
 
 ## Authors
