@@ -58,25 +58,34 @@ Options: -k INT    length of k-mer
 Usage:   prophex bwtdowngrade input.bwt output.bwt
 ```
 
-# Quick example
+## Quick example
 
-## Create BWA index for index.fa:
+### Create BWA index for index.fa:
 
 ```
 ./bwa index index.fa
 ```
 
-## Create ProPhex index upon BWA index for k=25:
+### Create ProPhex index upon BWA index for k=25:
 
 ```
 ./prophex build -k 25 index.fa
 ```
 
-## Query reads from reads.fq for k=25 using kLCP array with 4 threads:
+### Query reads from reads.fq for k=25 using kLCP array with 4 threads:
 
 ```
 ./prophex query -k 25 -u -t 4 index.fa index.fq
 ```
+
+## FAQs
+
+> Can I remove duplicate k-mers from the index in order to use less memory when querying?
+
+Yes, duplicate k-mers can be removed, e.g., using
+[BCalm](https://github.com/GATB/bcalm). A ProPhex index can then be built from
+the obtained unitigs.
+
 
 ## Issues
 
