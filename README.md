@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/prophyle/prophex.svg?branch=master)](https://travis-ci.org/prophyle/prophex)
 
-We introduce ProPhyle Index, a BWT-index based software for fast *k*-mer matching. It uses BWA[@BWA] as BWT-index implementation. ProPhyle Index is designed as a core computational part of [ProPhyle](https://prophyle.github.io), a phylogeny-based metagenomic classifier allowing fast and accurate read assignment.
-
-
-## Prerequisities
-
-* GCC 4.8+ or equivalent
-* ZLib
+ProPhex is an efficient k-mer index with a small memory footprint. It uses the
+[BWA](http://github.com/lh3/bwa) implementation of the BWT-index. ProPhex is
+designed as a core computational component of
+[ProPhyle](https://prophyle.github.io), a phylogeny-based metagenomic
+classifier allowing fast and accurate read assignment.
 
 
 ## Getting started
