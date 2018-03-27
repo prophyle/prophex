@@ -102,6 +102,13 @@ See [Releases](https://github.com/prophyle/prophex/releases).
 [MIT](https://github.com/prophyle/prophex/blob/master/LICENSE)
 
 
-## Author
+## Authors
 
 Kamil Salikhov \<salikhov.kamil@gmail.com\>
+
+[Karel Brinda](http://brinda.cz) \<kbrinda@hsph.harvard.edu\>
+
+Simone Pignotti \<pignottisimone@gmail.com\>
+
+[Gregory Kucherov](http://igm.univ-mlv.fr/~koutcher/) \<gregory.kucherov@univ-mlv.fr\>
+
