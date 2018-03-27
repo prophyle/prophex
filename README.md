@@ -4,6 +4,7 @@
 
 We introduce ProPhyle Index, a BWT-index based software for fast *k*-mer matching. It uses BWA[@BWA] as BWT-index implementation. ProPhyle Index is designed as a core computational part of [ProPhyle](https://prophyle.github.io), a phylogeny-based metagenomic classifier allowing fast and accurate read assignment.
 
+
 ## Prerequisities
 
 * GCC 4.8+ or equivalent
@@ -58,6 +59,7 @@ Options: -k INT    length of k-mer
 Usage:   prophex bwtdowngrade input.bwt output.bwt
 ```
 
+
 ## Quick example
 
 ### Create BWA index for index.fa:
@@ -77,6 +79,24 @@ Usage:   prophex bwtdowngrade input.bwt output.bwt
 ```
 ./prophex query -k 25 -u -t 4 index.fa index.fq
 ```
+
+
+## Output format
+
+Matches are reported in an extended
+[Kraken format](http://ccb.jhu.edu/software/kraken/MANUAL.html#output-format).
+ProPhex produces a tab-delimited file with the following columns:
+
+1. Category (unused, ‘U’ as a legacy value)
+2. Sequence name
+3. Final decision (unused, ‘0’ as a legacy value)
+4. Sequence length
+5. Assigned k-mers. Space-delimited list of blocks with the same assignment of
+   the following format: comma-delimited list of sets (or ‚A‘ for ambiguous, or
+   `0` for no matches), colon, length. Example: „2157,393595:1 393595:1 0:16"
+6. Bases (optional)
+7. Base qualities (optional)
+
 
 ## FAQs
 
