@@ -118,19 +118,24 @@ int bwt2fa(const char* prefix, const char* output_filename) {
 			return 1;
 		}
 	}
+  fprintf(stderr, "[prophex:%s] Loaded bwa index from %s\n", __func__, prefix);
 	char* seq = malloc(bwt->seq_len * sizeof(char));
 
 	bwtint_t i = 0;
 	bwtint_t bwt_pos = 0;
+  bwtint_t progress_output_step = (bwt->seq_len + 9) / 10;
 	while(i < bwt->seq_len) {
 		bwtint_t new_pos = bwt_pos - (bwt_pos > bwt->primary);
 		new_pos = bwt_B0(bwt, new_pos);
 		seq[bwt->seq_len - i - 1] = "ACGT"[new_pos];
 		new_pos = bwt->L2[new_pos] + bwt_occ(bwt, bwt_pos, new_pos);
 		bwt_pos = bwt_pos == bwt->primary? 0 : new_pos;
+    if (i > 0 && i % progress_output_step == 0) {
+		  fprintf(stderr, "[prophex:%s] %llu percents completed..\n", __func__, 10 * i / progress_output_step);
+    }
 		i++;
 	}
-
+	fprintf(stderr, "[prophex:%s] 100 percents of fasta calculated\n", __func__);
 	bntseq_t* bns = bns_restore_ann_only(prefix);
 
 	FILE* output_file = fopen(output_filename, "w");
@@ -146,6 +151,7 @@ int bwt2fa(const char* prefix, const char* output_filename) {
 		}
 		fprintf(output_file, "\n");
 	}
+	fprintf(stderr, "[prophex:%s] Reconstructed fasta written to %s\n", __func__, output_filename);
 	fclose(output_file);
 	return 0;
 }
