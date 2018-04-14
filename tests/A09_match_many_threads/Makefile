@@ -13,7 +13,7 @@ t%: _index.%.complete
 
 _index.%.complete:
 	$(BWA) index -p _index.$*.fa $(FA)
-	$(IND) build -k $(K) _index.$*.fa
+	$(IND) klcp -k $(K) _index.$*.fa
 	touch $@
 
 clean:

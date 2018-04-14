@@ -30,7 +30,7 @@ static int usage()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: build           construct index\n");
+	fprintf(stderr, "Command: klcp            construct index\n");
 	fprintf(stderr, "         query           query reads against index\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old more compact format without OCC array\n");
@@ -41,7 +41,7 @@ static int usage()
 
 static int usage_build(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex build <prefix>\n");
+	fprintf(stderr, "Usage:   prophex klcp <prefix>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
@@ -118,7 +118,7 @@ int prophex_query(int argc, char *argv[])
 	return 0;
 }
 
-int prophex_build(int argc, char *argv[])
+int prophex_klcp(int argc, char *argv[])
 {
 	int c;
 	prophex_opt_t *opt;
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 {
 	int ret = 0;
 	if (argc < 2) return usage();
-	if (strcmp(argv[1], "build") == 0) ret = prophex_build(argc - 1, argv + 1);
+	if (strcmp(argv[1], "klcp") == 0) ret = prophex_klcp(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "query") == 0) ret = prophex_query(argc - 1, argv+1);
 	else if (strcmp(argv[1], "bwtdowngrade") == 0) ret = prophex_bwtdowngrade(argc - 2, argv + 2);
 	else if (strcmp(argv[1], "bwt2fa") == 0) ret = prophex_bwt2fa(argc - 2, argv + 2);
