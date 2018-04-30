@@ -31,11 +31,11 @@ static int usage()
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Command: klcp            construct klcp index\n");
-	fprintf(stderr, "         query           query reads against index\n");
 	fprintf(stderr, "         index           construct bwa index\n");
+	fprintf(stderr, "         query           query reads against index\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old more compact format without OCC array\n");
-	fprintf(stderr, "         bwt2fa          reconstruct fa file from bwt\n");
+	fprintf(stderr, "         bwt2fa          reconstruct fasta file from bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
