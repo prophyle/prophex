@@ -35,7 +35,7 @@ void* construct_sa_parallel(void* data) {
 	return 0;
 }
 
-void build_index(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
+void build_klcp(const char *prefix, const prophex_opt_t *opt, int sa_intv) {
 	bwt_t *bwt;
 	{
 		if ((bwt = bwa_idx_load_bwt_without_sa(prefix)) == 0) {
