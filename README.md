@@ -23,21 +23,42 @@ conda install prophex
 ```
 
 # ProPhex commands
-
+<!---
+USAGE-BEGIN
+-->
 ```
+Program: prophex (a lossless k-mer index)
+Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
+Contact: kamil.salikhov@univ-mlv.fr
+
 Usage:   prophex command [options]
 
-Command: build         construct index
-         query         query reads against index
-         bwtdowngrade  downgrade .bwt to the old more compact format without OCC array
+Command: klcp            construct klcp index
+         index           construct bwa index
+         query           query reads against index
+
+         bwtdowngrade    downgrade .bwt to the old more compact format without OCC array
+         bwt2fa          reconstruct fasta file from bwt
+
 ```
 
 ```
-Usage:   prophex build <prefix>
+Usage:   prophex klcp <prefix>
 
 Options: -k INT    length of k-mer
          -s        construct k-LCP and SA in parallel
          -i        sampling distance for SA
+         -h        print help message
+
+```
+
+```
+Usage:   prophex index <prefix>
+Options: -k INT    length of k-mer
+         -s        construct k-LCP and SA in parallel
+         -i        sampling distance for SA
+         -h        print help message
+
 ```
 
 ```
@@ -50,26 +71,37 @@ Options: -k INT    length of k-mer
          -b        print sequences and base qualities
          -l STR    log file name to output statistics
          -t INT    number of threads [1]
-         -r INT    total size of reads in one chunk [10000000 bp]
+         -h        print help message
+
 ```
 
 ```
 Usage:   prophex bwtdowngrade input.bwt output.bwt
+         -h        print help message
+
 ```
 
+```
+Usage:   prophex bwt2fa input.fa output.fa
+         -h        print help message
+
+```
+
+<!---USAGE-END
+-->
 
 ## Quick example
 
 **Build a BWA index**
 
 ```
-./bwa index index.fa
+./prophex index index.fa
 ```
 
 **Build a k-LCP array for k=25**
 
 ```
-./prophex build -k 25 index.fa
+./prophex klcp -k 25 index.fa
 ```
 
 **Query reads from reads.fq for k=25 using the k-LCP array with 4 threads:**
@@ -129,4 +161,5 @@ Kamil Salikhov \<salikhov.kamil@gmail.com\>
 Simone Pignotti \<pignottisimone@gmail.com\>
 
 [Gregory Kucherov](http://igm.univ-mlv.fr/~koutcher/) \<gregory.kucherov@univ-mlv.fr\>
+
 
