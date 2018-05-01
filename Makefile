@@ -7,7 +7,7 @@ IND=./prophex
 
 DEPS= $(wildcard src/*.h) $(wildcard src/*.c) $(wildcard src/bwa/.*.h) $(wildcard src/bwa/*.c)
 
-all: prophex
+all: prophex readme
 
 prophex: $(DEPS)
 	$(MAKE) -C src
@@ -20,37 +20,36 @@ test:
 
 readme:
 	f=$$(mktemp);\
-	sed '/USAGE-BEGIN/q' README.md >> $$f; \
-	printf -- '-->\n' >> $$f; \
-	printf '```' >> $$f; \
-	$(IND) 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n' >> $$f; \
-	\
-	printf '```' >> $$f; \
-	$(IND) klcp -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n' >> $$f; \
-	\
-	printf '```' >> $$f; \
-	$(IND) index -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n' >> $$f; \
-	\
-	printf '```' >> $$f; \
-	$(IND) query -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n' >> $$f; \
-	\
-	printf '```' >> $$f; \
-	$(IND) bwtdowngrade -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n' >> $$f; \
-	\
-	printf '```' >> $$f; \
-	$(IND) bwt2fa -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-	printf '```\n\n<!---' >> $$f; \
-	sed -n '/USAGE-END/,$$ p' README.md >> $$f;\
-	printf '\n' >> $$f;\
-	cat $$f \
-	| perl -pe 's/^[\s]+$$/\n/g' \
-	| perl -pe 's/[\s]+$$/\n/g' \
-	> README.md;
+		sed '/USAGE-BEGIN/q' README.md >> $$f; \
+		printf -- '-->\n' >> $$f; \
+		printf '```' >> $$f; \
+		$(IND) 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) klcp -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) index -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) query -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) bwtdowngrade -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) bwt2fa -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		sed -n '/USAGE-END/,$$ p' README.md >> $$f;\
+		cat $$f \
+		| perl -pe 's/^[\s]+$$/\n/g' \
+		| perl -pe 's/[\s]+$$/\n/g' \
+		> README.md;
 
 clean: ## Clean
 	$(MAKE) -C src clean
