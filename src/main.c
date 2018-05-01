@@ -20,8 +20,7 @@
 #include "bwa.h"
 #include "prophex_build.h"
 #include "bwa_utils.h"
-
-#define VERSION "0.1.0"
+#include "version.h"
 
 static int usage()
 {
