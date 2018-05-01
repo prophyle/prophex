@@ -44,16 +44,6 @@ Command: index           construct a BWA index and k-LCP
 ```
 
 ```
-Usage:   prophex klcp <prefix>
-
-Options: -k INT    length of k-mer
-         -s        construct k-LCP and SA in parallel
-         -i        sampling distance for SA
-         -h        print help message
-
-```
-
-```
 Usage:   prophex index <prefix>
 Options: -k INT    k-mer length for k-LCP
          -s        construct k-LCP and SA in parallel
@@ -72,6 +62,16 @@ Options: -k INT    length of k-mer
          -b        print sequences and base qualities
          -l STR    log file name to output statistics
          -t INT    number of threads [1]
+         -h        print help message
+
+```
+
+```
+Usage:   prophex klcp <prefix>
+
+Options: -k INT    length of k-mer
+         -s        construct k-LCP and SA in parallel
+         -i        sampling distance for SA
          -h        print help message
 
 ```

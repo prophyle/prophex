@@ -27,15 +27,15 @@ readme:
 		printf '```\n\n' >> $$f; \
 		\
 		printf '```' >> $$f; \
-		$(IND) klcp -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
-		printf '```\n\n' >> $$f; \
-		\
-		printf '```' >> $$f; \
 		$(IND) index -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
 		printf '```\n\n' >> $$f; \
 		\
 		printf '```' >> $$f; \
 		$(IND) query -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
+		printf '```\n\n' >> $$f; \
+		\
+		printf '```' >> $$f; \
+		$(IND) klcp -h 2>&1 | perl -pe 's/^(.*)$$/\1/g' >> $$f; \
 		printf '```\n\n' >> $$f; \
 		\
 		printf '```' >> $$f; \
