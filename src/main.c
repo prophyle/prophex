@@ -21,10 +21,13 @@
 #include "prophex_build.h"
 #include "bwa_utils.h"
 
+#define VERSION "0.1.0"
+
 static int usage()
 {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Program: prophex (a lossless k-mer index)\n");
+  fprintf(stderr, "Version: %s\n", VERSION);
 	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
 	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
 	fprintf(stderr, "\n");

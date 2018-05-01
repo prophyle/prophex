@@ -28,6 +28,7 @@ USAGE-BEGIN
 -->
 ```
 Program: prophex (a lossless k-mer index)
+Version: 0.1.0
 Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
 Contact: kamil.salikhov@univ-mlv.fr
 
