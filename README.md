@@ -34,12 +34,12 @@ Contact: kamil.salikhov@univ-mlv.fr
 
 Usage:   prophex command [options]
 
-Command: klcp            construct klcp index
-         index           construct bwa index
+Command: index           construct a BWA index and k-LCP
          query           query reads against index
 
-         bwtdowngrade    downgrade .bwt to the old more compact format without OCC array
-         bwt2fa          reconstruct fasta file from bwt
+         klcp            construct an additional k-LCP
+         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ
+         bwt2fa          reconstruct FASTA from BWT
 
 ```
 
@@ -55,7 +55,7 @@ Options: -k INT    length of k-mer
 
 ```
 Usage:   prophex index <prefix>
-Options: -k INT    length of k-mer
+Options: -k INT    k-mer length for k-LCP
          -s        construct k-LCP and SA in parallel
          -i        sampling distance for SA
          -h        print help message

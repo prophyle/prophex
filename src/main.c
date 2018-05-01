@@ -27,18 +27,18 @@ static int usage()
 {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Program: prophex (a lossless k-mer index)\n");
-  fprintf(stderr, "Version: %s\n", VERSION);
+    fprintf(stderr, "Version: %s\n", VERSION);
 	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
 	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex command [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: klcp            construct klcp index\n");
-	fprintf(stderr, "         index           construct bwa index\n");
+	fprintf(stderr, "Command: index           construct a BWA index and k-LCP\n");
 	fprintf(stderr, "         query           query reads against index\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old more compact format without OCC array\n");
-	fprintf(stderr, "         bwt2fa          reconstruct fasta file from bwt\n");
+	fprintf(stderr, "         klcp            construct an additional k-LCP\n");
+	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ\n");
+	fprintf(stderr, "         bwt2fa          reconstruct FASTA from BWT\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -58,7 +58,7 @@ static int usage_klcp(){
 static int usage_index(){
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex index <prefix>\n");
-	fprintf(stderr, "Options: -k INT    length of k-mer\n");
+	fprintf(stderr, "Options: -k INT    k-mer length for k-LCP\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
 	fprintf(stderr, "         -i        sampling distance for SA\n");
 	fprintf(stderr, "         -h        print help message\n");
