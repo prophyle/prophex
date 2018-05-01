@@ -6,9 +6,9 @@ K=3
 all: diff
 
 diff:
-	$(BWA) index $(FA)
-	$(IND) build -k $(K) $(FA)
-	$(IND) query -k $(K) -u $(FA) reads.fq > _obtained_matches.txt
+	$(IND) index $(FA)
+	$(IND) klcp -k $(K) $(FA)
+	$(IND) query -k $(K) $(FA) reads.fq > _obtained_matches.txt
 	diff -c _obtained_matches.txt expected_matches.txt
 
 clean:

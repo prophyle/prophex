@@ -7,11 +7,11 @@ diffs = $(wildcard ./diff*.txt)
 
 all: 
 	$(BWA) index $(FA) $(FQ) 
-	$(IND) build -k $(K) $(FA) $(FQ)
+	$(IND) klcp -k $(K) $(FA) $(FQ)
 	mv $(FA).sa $(FA).sa.separate
 	mv $(FA).$(K).klcp $(FA).$(K).klcp.separate
 
-	$(IND) build -s -k $(K) $(FA) 
+	$(IND) klcp -s -k $(K) $(FA) 
 
 	cmp $(FA).sa $(FA).sa.separate > diff_sa.txt
 	cmp $(FA).$(K).klcp $(FA).$(K).klcp.separate > diff_klcp.txt

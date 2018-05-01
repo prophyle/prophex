@@ -124,7 +124,7 @@ def create_bwa_index(fa):
 
 
 def create_klcp(fa, k):
-    run_safe([prophyle_index, 'build', '-k', k, fa, ">", "/dev/null"])
+    run_safe([prophyle_index, 'klcp', '-k', k, fa, ">", "/dev/null"])
 
 
 def query(fa, fq, k, u=False, v=False, t=1):
