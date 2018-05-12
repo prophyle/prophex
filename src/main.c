@@ -30,7 +30,7 @@ static int usage()
 	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
 	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex command [options]\n");
+	fprintf(stderr, "Usage:   prophex <command> [options]\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Command: index           construct a BWA index and k-LCP\n");
 	fprintf(stderr, "         query           query reads against index\n");
@@ -44,7 +44,7 @@ static int usage()
 
 static int usage_klcp(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex klcp <prefix>\n");
+	fprintf(stderr, "Usage:   prophex klcp [options] <idxbase>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
@@ -56,7 +56,7 @@ static int usage_klcp(){
 
 static int usage_index(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex index <prefix>\n");
+	fprintf(stderr, "Usage:   prophex index [options] <idxbase>\n");
 	fprintf(stderr, "Options: -k INT    k-mer length for k-LCP\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
 	fprintf(stderr, "         -i        sampling distance for SA\n");
@@ -67,7 +67,7 @@ static int usage_index(){
 
 static int usage_bwtdowngrade() {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex bwtdowngrade input.bwt output.bwt\n");
+	fprintf(stderr, "Usage:   prophex bwtdowngrade <input.bwt> <output.bwt>\n");
 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
@@ -75,7 +75,7 @@ static int usage_bwtdowngrade() {
 
 static int usage_bwt2fa(){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex bwt2fa input.fa output.fa\n");
+	fprintf(stderr, "Usage:   prophex bwt2fa <idxbase> <output.fa>\n");
 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
@@ -83,7 +83,7 @@ static int usage_bwt2fa(){
 
 static int usage_query(int threads){
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:   prophex query [options] <prefix> <in.fq>\n");
+	fprintf(stderr, "Usage:   prophex query [options] <idxbase> <in.fq>\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -u        use k-LCP for querying\n");
