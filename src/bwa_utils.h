@@ -7,8 +7,8 @@
 #ifndef BWAUTILS_H
 #define BWAUTILS_H
 
-#include "bwt.h"
 #include "bwa.h"
+#include "bwt.h"
 #include "prophex_utils.h"
 
 void bwa_destroy_unused_fields(bwaidx_t* idx);
@@ -21,4 +21,4 @@ bwaidx_t* bwa_idx_load_partial(const char* hint, int which, int need_log, FILE* 
 bwt_t* bwa_idx_load_bwt_without_sa(const char* hint);
 void bwt_destroy_without_sa(bwt_t* bwt);
 
-#endif // BWAUTILS_H
+#endif  // BWAUTILS_H
