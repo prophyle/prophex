@@ -1,6 +1,8 @@
 prophex
 prophyle_index
 
+index.fa.*
+
 # Prerequisites
 *.d
 
