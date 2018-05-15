@@ -1,4 +1,4 @@
-.PHONY: all help clean test
+.PHONY: all help clean test clang-format
 
 SHELL=/usr/bin/env bash -eo pipefail
 IND=./prophex
@@ -50,6 +50,9 @@ readme:
 		| perl -pe 's/^[\s]+$$/\n/g' \
 		| perl -pe 's/[\s]+$$/\n/g' \
 		> README.md;
+
+format:
+	clang-format -verbose -i src/*.h src/*.c
 
 clean: ## Clean
 	$(MAKE) -C src clean

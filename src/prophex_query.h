@@ -1,16 +1,16 @@
 /*
-	prophex query command implementation.
-	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
-	Licence: MIT
+    prophex query command implementation.
+    Author: Kamil Salikhov <salikhov.kamil@gmail.com>
+    Licence: MIT
 */
 
 #ifndef PROPHEX_QUERY_H
 #define PROPHEX_QUERY_H
 
 #include <stdint.h>
+#include "bwa.h"
 #include "bwt.h"
 #include "bwtaln.h"
-#include "bwa.h"
 #include "klcp.h"
 #include "prophex_utils.h"
 
@@ -44,4 +44,4 @@ typedef struct {
 
 void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt);
 
-#endif //PROPHEX_QUERY_H
+#endif  // PROPHEX_QUERY_H

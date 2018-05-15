@@ -9,8 +9,8 @@
 
 #include "prophex_utils.h"
 
-void build_klcp(const char *prefix, const prophex_opt_t *opt, int sa_intv);
+void build_klcp(const char* prefix, const prophex_opt_t* opt, int sa_intv);
 int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file);
 int bwt2fa(const char* prefix, const char* output_filename);
 
-#endif //PROPHEX_BUILD_H
+#endif  // PROPHEX_BUILD_H

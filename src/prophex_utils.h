@@ -1,7 +1,7 @@
 /*
-	Structure for prophex options.
-	Author: Kamil Salikhov <salikhov.kamil@gmail.com>
-	Licence: MIT
+    Structure for prophex options.
+    Author: Kamil Salikhov <salikhov.kamil@gmail.com>
+    Licence: MIT
 */
 
 #ifndef PROPHEX_UTILS_H
@@ -33,4 +33,4 @@ typedef struct {
 
 prophex_opt_t* prophex_init_opt();
 
-#endif //PROPHEX_UTILS_H
+#endif  // PROPHEX_UTILS_H

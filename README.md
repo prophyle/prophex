@@ -28,11 +28,11 @@ USAGE-BEGIN
 -->
 ```
 Program: prophex (a lossless k-mer index)
-Version: 0.1.0
+Version: 0.1.1
 Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
 Contact: kamil.salikhov@univ-mlv.fr
 
-Usage:   prophex command [options]
+Usage:   prophex <command> [options]
 
 Command: index           construct a BWA index and k-LCP
          query           query reads against index
@@ -44,7 +44,7 @@ Command: index           construct a BWA index and k-LCP
 ```
 
 ```
-Usage:   prophex index <prefix>
+Usage:   prophex index [options] <idxbase>
 Options: -k INT    k-mer length for k-LCP
          -s        construct k-LCP and SA in parallel
          -i        sampling distance for SA
@@ -53,7 +53,7 @@ Options: -k INT    k-mer length for k-LCP
 ```
 
 ```
-Usage:   prophex query [options] <prefix> <in.fq>
+Usage:   prophex query [options] <idxbase> <in.fq>
 
 Options: -k INT    length of k-mer
          -u        use k-LCP for querying
@@ -67,7 +67,7 @@ Options: -k INT    length of k-mer
 ```
 
 ```
-Usage:   prophex klcp <prefix>
+Usage:   prophex klcp [options] <idxbase>
 
 Options: -k INT    length of k-mer
          -s        construct k-LCP and SA in parallel
@@ -77,13 +77,13 @@ Options: -k INT    length of k-mer
 ```
 
 ```
-Usage:   prophex bwtdowngrade input.bwt output.bwt
+Usage:   prophex bwtdowngrade <input.bwt> <output.bwt>
          -h        print help message
 
 ```
 
 ```
-Usage:   prophex bwt2fa input.fa output.fa
+Usage:   prophex bwt2fa <idxbase> <output.fa>
          -h        print help message
 
 ```
