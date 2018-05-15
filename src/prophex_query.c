@@ -548,7 +548,8 @@ void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt) {
 	int fd;
 	ko = kopen(fn_fa, &fd);
 	if (ko == 0) {
-		if (bwa_verbose >= 1) fprintf(stderr, "[E::%s] fail to open file `%s'.\n", __func__, fn_fa);
+		if (bwa_verbose >= 1)
+			fprintf(stderr, "[E::%s] fail to open file `%s'.\n", __func__, fn_fa);
 		return;
 	}
 	fp = gzdopen(fd, "r");

@@ -97,8 +97,9 @@ int bwtdowngrade(const char* bwt_input_file, const char* bwt_output_file) {
 			// memcpy(buf + k, c, sizeof(bwtint_t) * 4);
 			k += sizeof(bwtint_t);  // in fact: sizeof(bwtint_t)=4*(sizeof(bwtint_t)/4)
 		}
-		if (i % 16 == 0) buf[i / 16] = bwt->bwt[k++];  // 16 == sizeof(uint32_t)/2
-		                                               // ++c[bwt_B00(bwt, i)];
+		if (i % 16 == 0)
+			buf[i / 16] = bwt->bwt[k++];  // 16 == sizeof(uint32_t)/2
+			                              // ++c[bwt_B00(bwt, i)];
 	}
 	// fprintf(stderr, "end loop\n");
 	free(bwt->bwt);
