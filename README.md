@@ -1,6 +1,8 @@
 # ProPhex
 
 [![Build Status](https://travis-ci.org/prophyle/prophex.svg?branch=master)](https://travis-ci.org/prophyle/prophex)
+[![Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](https://anaconda.org/bioconda/prophex)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1247431.svg)](http://doi.org/10.5281/zenodo.1247431)
 
 ProPhex is an efficient k-mer index with a small memory footprint. It uses the
 [BWA](http://github.com/lh3/bwa) implementation of the BWT-index. ProPhex is
