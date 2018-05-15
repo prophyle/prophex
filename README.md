@@ -22,6 +22,26 @@ cd prophex && make -j
 conda install prophex
 ```
 
+
+
+## Quick example
+
+
+```
+# Build a ProPhex index
+./prophex -k 25 index.fa
+
+# Query reads from reads.fq for k=25 using the k-LCP array with 4 threads
+./prophex query -k 25 -u -t 4 index.fa index.fq
+
+# Query reads from reads.fq for k=20 
+./prophex query -k 25 index.fa index.fq
+
+```
+
+
+
+
 # ProPhex commands
 <!---
 USAGE-BEGIN
@@ -90,27 +110,6 @@ Usage:   prophex bwt2fa <idxbase> <output.fa>
 
 <!---USAGE-END
 -->
-
-## Quick example
-
-**Build a BWA index**
-
-```
-./prophex index index.fa
-```
-
-**Build a k-LCP array for k=25**
-
-```
-./prophex klcp -k 25 index.fa
-```
-
-**Query reads from reads.fq for k=25 using the k-LCP array with 4 threads:**
-
-```
-./prophex query -k 25 -u -t 4 index.fa index.fq
-```
-
 
 ## Output format
 
