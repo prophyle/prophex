@@ -1,4 +1,8 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#
+# Based on https://github.com/electronicarts/EASTL/blob/master/.clang-format
+#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 Language                                  : Cpp
 BasedOnStyle                              : Google
 Standard                                  : Auto
