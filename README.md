@@ -31,11 +31,11 @@ conda install prophex
 # Build a ProPhex index
 ./prophex index -k 25 index.fa
 
-# Query reads from reads.fq for k=25 using the k-LCP array with 4 threads
+# Query reads from reads.fq for k=25 (with k-LCP)
 ./prophex query -k 25 -u -t 4 index.fa index.fq
 
-# Query reads from reads.fq for k=20 
-./prophex query -k 25 index.fa index.fq
+# Query reads from reads.fq for k=20 (with 4 threads and without k-LCP)
+./prophex query -k 20 index.fa index.fq
 
 ```
 
