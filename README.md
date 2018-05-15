@@ -28,7 +28,7 @@ USAGE-BEGIN
 -->
 ```
 Program: prophex (a lossless k-mer index)
-Version: 0.1.1
+Version: 0.1.0
 Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
 Contact: kamil.salikhov@univ-mlv.fr
 
@@ -133,9 +133,14 @@ ProPhex produces a tab-delimited file with the following columns:
 
 > Can I remove duplicate k-mers from the index in order to use less memory when querying?
 
-Yes, duplicate k-mers can be removed, e.g., using
-[BCalm](https://github.com/GATB/bcalm). A ProPhex index can then be built from
-the obtained unitigs.
+Yes, duplicate k-mers can be removed using
+[ProphAsm](https://github.com/prophyle/prophasm), which assembles contigs by
+greedy enumeration of disjoint paths in the associated de-Bruijn graph.
+[BCalm](https://github.com/GATB/bcalm) is another tool that can be used with
+ProPhex. Compared to ProPhex, BCalm has a smaller memory footprint. On the
+other hand, the resulting FASTA file can be significantly bigger (when
+assemblying, BCalm stops at every branching k-mer).
+
 
 
 ## Issues
