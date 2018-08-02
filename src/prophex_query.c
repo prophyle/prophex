@@ -51,7 +51,7 @@ int calculate_sa_interval_restart(const bwt_t* bwt, int len, const ubyte_t* str,
 }
 
 int calculate_sa_interval_continue(const bwt_t* bwt, int len, const ubyte_t* str, uint64_t* k, uint64_t* l, uint64_t* decreased_k,
-                                   uint64_t* increased_l, int start_pos, const klcp_t* klcp) {
+																	 uint64_t* increased_l, int start_pos, const klcp_t* klcp) {
 	*k = decrease_sa_position(klcp, *k);
 	*decreased_k = *k;
 	*l = increase_sa_position(klcp, *l);
@@ -67,7 +67,7 @@ size_t get_positions(const bwaidx_t* idx, bwt_position_t* positions, const int q
 			break;
 		}
 		int strand;
-		uint64_t pos = bwa_sa2pos(idx->bns, idx->bwt, t, query_length, &strand);  // bwt_sa(bwt, t);
+		uint64_t pos = bwa_sa2pos(idx->bns, idx->bwt, t, query_length, &strand);	// bwt_sa(bwt, t);
 		positions[t - k].position = pos;
 		positions[t - k].strand = strand;
 		positions[t - k].rid = -1;
@@ -77,8 +77,8 @@ size_t get_positions(const bwaidx_t* idx, bwt_position_t* positions, const int q
 
 int is_position_on_border(const bwaidx_t* idx, bwt_position_t* position, int query_length) {
 	return (position->position + query_length > idx->bns->l_pac ||
-	        (position->rid + 1 < idx->bns->n_seqs && position->position + query_length > idx->bns->anns[position->rid + 1].offset) ||
-	        position->position < idx->bns->anns[position->rid].offset);
+					(position->rid + 1 < idx->bns->n_seqs && position->position + query_length > idx->bns->anns[position->rid + 1].offset) ||
+					position->position < idx->bns->anns[position->rid].offset);
 }
 
 void sort(int count, int** array) {
@@ -95,7 +95,7 @@ void sort(int count, int** array) {
 }
 
 size_t get_nodes_from_positions(const bwaidx_t* idx, const int query_length, const int positions_cnt, bwt_position_t* positions, int32_t* seen_nodes,
-                                int8_t** seen_nodes_marks, int skip_positions_on_border) {
+																int8_t** seen_nodes_marks, int skip_positions_on_border) {
 	size_t nodes_cnt = 0;
 	int i;
 	for (i = 0; i < positions_cnt; ++i) {
@@ -147,7 +147,7 @@ void strncat_with_check(char* str, char* str_to_append, int* str_length, int str
 }
 
 void construct_streaks(char** all_streaks, char** current_streak, int* seen_nodes, int nodes_cnt, int streak_size, int is_ambiguous_streak,
-                       int* is_first_streak) {
+		int* is_first_streak, int is_filtered_streak) {
 	if (*is_first_streak) {
 		*all_streaks[0] = '\0';
 	}
@@ -156,15 +156,18 @@ void construct_streaks(char** all_streaks, char** current_streak, int* seen_node
 	if (is_ambiguous_streak) {
 		strcat(*current_streak, "A:");
 		current_streak_approximate_length += 2;
+	} else if (is_filtered_streak) {
+		strcat(*current_streak, "X:");
+		current_streak_approximate_length += 2;
 	} else if (nodes_cnt > 0) {
 		int r;
 		for (r = 0; r < nodes_cnt - 1; ++r) {
 			strncat_with_check(*current_streak, get_node_name(seen_nodes[r]), &current_streak_approximate_length, get_node_name_length(seen_nodes[r]),
-			                   MAX_SOFT_STREAK_LENGTH);
+					MAX_SOFT_STREAK_LENGTH);
 			strncat_with_check(*current_streak, ",", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 		}
 		strncat_with_check(*current_streak, get_node_name(seen_nodes[nodes_cnt - 1]), &current_streak_approximate_length,
-		                   get_node_name_length(seen_nodes[nodes_cnt - 1]), MAX_SOFT_STREAK_LENGTH);
+											 get_node_name_length(seen_nodes[nodes_cnt - 1]), MAX_SOFT_STREAK_LENGTH);
 		strncat_with_check(*current_streak, ":", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 	} else {
 		strncat_with_check(*current_streak, "0:", &current_streak_approximate_length, 2, MAX_SOFT_STREAK_LENGTH);
@@ -216,21 +219,21 @@ int equal(int a_cnt, const int* a, int b_cnt, const int* b) {
 	return 1;
 }
 
-void print_read(const bseq1_t* p) {
+void print_read(FILE* f, const bseq1_t* p) {
 	int j;
 	for (j = (int)p->l_seq - 1; j >= 0; j--) {
-		fprintf(stdout, "%c", "ACGTN"[p->seq[j]]);
+		fprintf(f, "%c", "ACGTN"[p->seq[j]]);
 	}
 }
 
-void print_read_qual(const bseq1_t* p) {
+void print_read_qual(FILE* f, const bseq1_t* p) {
 	if (p->qual) {
 		int j;
 		for (j = 0; j < (int)p->l_seq; j++) {
-			fprintf(stdout, "%c", p->qual[j]);
+			fprintf(f, "%c", p->qual[j]);
 		}
 	} else {
-		fprintf(stdout, "*");
+		fprintf(f, "*");
 	}
 }
 
@@ -258,9 +261,11 @@ prophex_worker_t* prophex_worker_init(const bwaidx_t* idx, int32_t seqs_cnt, con
 	}
 	prophex_worker->seqs_cnt = seqs_cnt;
 	prophex_worker->output = malloc(seqs_cnt * sizeof(char*));
+	prophex_worker->passed = malloc(seqs_cnt * sizeof(int));
 	int i = 0;
 	for (i = 0; i < seqs_cnt; ++i) {
 		prophex_worker->output[i] = NULL;
+		prophex_worker->passed[i] = 0;
 	}
 	return prophex_worker;
 }
@@ -307,6 +312,9 @@ void prophex_worker_destroy(prophex_worker_t* prophex_worker) {
 			free(prophex_worker->output);
 		}
 	}
+	if (prophex_worker->passed) {
+		free(prophex_worker->passed);
+	}
 	free(prophex_worker);
 }
 
@@ -324,13 +332,13 @@ void process_sequence(void* data, int seq_index, int tid) {
 	int8_t* seen_nodes_marks = aux_data.seen_nodes_marks;
 	int i;
 
-	for (i = 0; i < seq.l_seq; ++i)  // convert to 2-bit encoding if we have not done so
+	for (i = 0; i < seq.l_seq; ++i) // convert to 2-bit encoding if we have not done so
 		seq.seq[i] = seq.seq[i] < 4 ? seq.seq[i] : nst_nt4_table[(int)seq.seq[i]];
 	seq_reverse(seq.l_seq, seq.seq, 0);
 
 	if (opt->output_old) {
 		fprintf(stdout, "#");
-		print_read(&seq);
+		print_read(stdout, &seq);
 		fprintf(stdout, "\n");
 	}
 	bwt_t* bwt = idx->bwt;
@@ -345,6 +353,14 @@ void process_sequence(void* data, int seq_index, int tid) {
 	int last_ambiguous_index = 0 - opt->kmer_length;
 	int is_ambiguous_streak = 0;
 	int ambiguous_streak_just_ended = 0;
+	int match_number_to_pass = 0;
+	int matches = 0;
+
+	if (opt->match_proportion >= 0) {
+		match_number_to_pass = opt->match_proportion * (seq.l_seq - opt->kmer_length + 1);
+	} else {
+		match_number_to_pass = opt->match_number;
+	}
 	if (start_pos + opt->kmer_length > seq.l_seq) {
 		if (opt->output) {
 			prophex_worker->output[seq_index] = malloc(5 * sizeof(char));
@@ -359,6 +375,12 @@ void process_sequence(void* data, int seq_index, int tid) {
 		}
 		while (start_pos + opt->kmer_length <= seq.l_seq) {
 			int end_pos = start_pos + opt->kmer_length - 1;
+			if (!opt->is_query && matches + seq.l_seq - end_pos < match_number_to_pass) {
+				break;
+			}
+			if (!opt->is_query && matches >= match_number_to_pass) {
+				break;
+			}
 			if (opt->output) {
 				if (start_pos > 0 && seq.seq[end_pos] > 3) {
 					last_ambiguous_index = end_pos;
@@ -366,7 +388,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 				if (end_pos - last_ambiguous_index < opt->kmer_length) {
 					if (!is_ambiguous_streak) {
 						construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+							&is_first_streak, 0);
 						is_ambiguous_streak = 1;
 						current_streak_size = 1;
 					} else {
@@ -377,7 +399,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 				} else {
 					if (is_ambiguous_streak && current_streak_size > 0) {
 						construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+							&is_first_streak, 0);
 						is_ambiguous_streak = 0;
 						current_streak_size = 0;
 					}
@@ -416,7 +438,10 @@ void process_sequence(void* data, int seq_index, int tid) {
 					positions_cnt = get_positions(idx, aux_data.positions, opt->kmer_length, k, l);
 				}
 				nodes_cnt = get_nodes_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_nodes, &seen_nodes_marks,
-				                                     opt->skip_positions_on_border);
+						opt->skip_positions_on_border);
+				if (nodes_cnt > 0) {
+					matches++;
+				}
 			}
 			if (opt->output_old) {
 				output_old(seen_nodes, nodes_cnt);
@@ -425,7 +450,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 					current_streak_size++;
 				} else {
 					construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-					                  &is_first_streak);
+							&is_first_streak, 0);
 					current_streak_size = 1;
 				}
 			}
@@ -439,9 +464,20 @@ void process_sequence(void* data, int seq_index, int tid) {
 		}
 		if (current_streak_size > 0) {
 			construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-			                  &is_first_streak);
+					&is_first_streak, 0);
 		}
 		if (opt->output) {
+			if (!opt->is_query) {
+				if (matches >= match_number_to_pass) {
+          prophex_worker->passed[seq_index] = 1;
+				}
+				current_streak_size = seq.l_seq - start_pos - opt->kmer_length + 1;
+        if (current_streak_size > 0) {
+				  is_ambiguous_streak = 0;
+				  int is_filtered_streak = 1;
+				  construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak, &is_first_streak, is_filtered_streak);
+        }
+			}
 			size_t all_streaks_length = strlen(all_streaks);
 			prophex_worker->output[seq_index] = malloc((all_streaks_length + 1) * sizeof(char));
 			strncpy(prophex_worker->output[seq_index], all_streaks, all_streaks_length + 1);
@@ -455,19 +491,58 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs, const pro
 	prophex_worker_t* prophex_worker = prophex_worker_init(idx, n_seqs, seqs, opt, klcp);
 	kt_for(opt->n_threads, process_sequence, prophex_worker, n_seqs);
 	int i;
+	FILE* passed_reads_file;
+	FILE* filtered_reads_file;
+	if (!opt->is_query) {
+		if (opt->passed_reads_file_name) {
+			passed_reads_file = fopen(opt->passed_reads_file_name, "w");
+		}
+		if (opt->filtered_reads_file_name) {
+			filtered_reads_file = fopen(opt->filtered_reads_file_name, "w");
+		}
+	}
 	for (i = 0; i < n_seqs; ++i) {
 		bseq1_t* seq = seqs + i;
 		if (opt->output) {
-			fprintf(stdout, "U\t%s\t0\t%d\t", seq->name, seq->l_seq);
+			if (opt->is_query) {
+				fprintf(stdout, "U");
+			} else {
+				if (prophex_worker->passed[i]) {
+					fprintf(stdout, "C");
+					if (opt->passed_reads_file_name) {
+						fprintf(passed_reads_file, "%s\n", seq->name);
+						print_read(passed_reads_file, seq);
+						fprintf(passed_reads_file, "\n");
+						print_read_qual(passed_reads_file, seq);
+						fprintf(passed_reads_file, "\n");
+					}
+				} else {
+					fprintf(stdout, "U");
+					if (opt->filtered_reads_file_name) {
+						fprintf(filtered_reads_file, "%s\n%d\n", seq->name, seq->l_seq);
+						print_read(filtered_reads_file, seq);
+						fprintf(filtered_reads_file, "\n");
+						print_read_qual(filtered_reads_file, seq);
+						fprintf(filtered_reads_file, "\n");
+					}
+				}
+			}
+			fprintf(stdout, "\t%s\t0\t%d\t", seq->name, seq->l_seq);
 			print_streaks(prophex_worker->output[i]);
 			if (opt->output_read_qual) {
 				fprintf(stdout, "\t");
-				print_read(seq);
+				print_read(stdout, seq);
 				fprintf(stdout, "\t");
-				print_read_qual(seq);
+				print_read_qual(stdout, seq);
 			}
 			fprintf(stdout, "\n");
 		}
+	}
+	if (opt->filtered_reads_file_name) {
+		fclose(filtered_reads_file);
+	}
+	if (opt->passed_reads_file_name) {
+		fclose(passed_reads_file);
 	}
 	prophex_worker_destroy(prophex_worker);
 }
@@ -570,7 +645,7 @@ void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt) {
 
 	fprintf(stderr, "[prophex:%s] match time: %.2f sec\n", __func__, total_time);
 	fprintf(stderr, "[prophex::%s] Processed %llu reads in %.3f CPU sec, %.3f real sec\n", __func__, total_seqs, cputime() - ctime,
-	        realtime() - rtime);
+					realtime() - rtime);
 	if (opt->need_log) {
 		fprintf(log_file, "matching_time\t%.2fs\n", total_time);
 		fprintf(log_file, "reads\t%" PRId64 "\n", total_seqs);

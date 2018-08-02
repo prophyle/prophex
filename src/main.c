@@ -33,6 +33,7 @@ static int usage() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Command: index           construct a BWA index and k-LCP\n");
 	fprintf(stderr, "         query           query reads against index\n");
+	fprintf(stderr, "         filter          filter reads\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "         klcp            construct an additional k-LCP\n");
 	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ\n");
@@ -45,10 +46,10 @@ static int usage_klcp() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex klcp [options] <idxbase>\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Options: -k INT    length of k-mer\n");
+ 	fprintf(stderr, "Options: -k INT    length of k-mer\n");
 	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
-	fprintf(stderr, "         -i        sampling distance for SA\n");
-	fprintf(stderr, "         -h        print help message\n");
+ 	fprintf(stderr, "         -i        sampling distance for SA\n");
+ 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -67,7 +68,7 @@ static int usage_index() {
 static int usage_bwtdowngrade() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex bwtdowngrade <input.bwt> <output.bwt>\n");
-	fprintf(stderr, "         -h        print help message\n");
+	fprintf(stderr, "Options:  -h    print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -75,6 +76,24 @@ static int usage_bwtdowngrade() {
 static int usage_bwt2fa() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex bwt2fa <idxbase> <output.fa>\n");
+	fprintf(stderr, "Options: -h    print help message\n");
+	fprintf(stderr, "\n");
+	return 1;
+}
+
+static int usage_filter(int threads) {
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage:   prophex filter [options] <idxbase> <in.fq>\n");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Options: -k INT    length of k-mer\n");
+	fprintf(stderr, "         -u        use k-LCP for querying\n");
+	fprintf(stderr, "         -b        print sequences and base qualities\n");
+	fprintf(stderr, "         -l STR    log file name to output statistics\n");
+	fprintf(stderr, "         -t INT    number of threads [%d]\n", threads);
+	fprintf(stderr, "         -m FLOAT  keep only reads with proportion of matches >= FLOAT [0.3]\n");
+	fprintf(stderr, "         -n INT    keep only reads with number of matches >= INT (ignored if -m is set)\n");
+	fprintf(stderr, "         -o        prefix for fastq for passing reads\n");
+	fprintf(stderr, "         -f        prefix for fastq for filtered reads\n");
 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
@@ -96,13 +115,86 @@ static int usage_query(int threads) {
 	return 1;
 }
 
+int prophex_filter(int argc, char *argv[]) {
+	int c;
+	prophex_opt_t *opt;
+	char *prefix;
+	int usage = 0;
+	opt = prophex_init_opt();
+	opt->is_query = 0;
+	int m_set = 0;
+	int n_set = 0;
+	while ((c = getopt(argc, argv, "l:puvk:bt:hm:n:o:f:")) >= 0) {
+		switch (c) {
+			case 'u':
+				opt->use_klcp = 1;
+				break;
+			case 'k':
+				opt->kmer_length = atoi(optarg);
+				break;
+			case 'l': {
+				opt->need_log = 1;
+				opt->log_file_name = optarg;
+				break;
+			}
+			case 'b':
+				opt->output_read_qual = 1;
+				break;
+			case 't':
+				opt->n_threads = atoi(optarg);
+				break;
+			case 'h':
+				usage = 1;
+				break;
+			case 'm':
+				opt->match_proportion = atof(optarg);
+				m_set = 1;
+				break;
+			case 'n':
+				opt->match_number = atoi(optarg);
+				n_set = 1;
+				break;
+			case 'o':
+				opt->passed_reads_file_name = optarg;
+				break;
+			case 'f':
+				opt->filtered_reads_file_name = optarg;
+				break;
+			default:
+				return 1;
+		}
+	}
+	if (n_set && !m_set) {
+		opt->match_proportion = -1;
+	}
+	if (usage) {
+		usage_filter(opt->n_threads);
+		return 0;
+	}
+
+	if (optind + 2 > argc) {
+		usage_filter(opt->n_threads);
+		return 1;
+	}
+	if ((prefix = bwa_idx_infer_prefix(argv[optind])) == 0) {
+		fprintf(stderr, "[prophex:%s] fail to locate the index %s\n", __func__, argv[optind]);
+		free(opt);
+		return 1;
+	}
+	query(prefix, argv[optind + 1], opt);
+	free(opt);
+	free(prefix);
+	return 0;
+}
+
 int prophex_query(int argc, char *argv[]) {
 	int c;
 	prophex_opt_t *opt;
 	char *prefix;
 	int usage = 0;
 	opt = prophex_init_opt();
-	while ((c = getopt(argc, argv, "l:psuvk:bt:h")) >= 0) {
+	opt->is_query = 1;
+	while ((c = getopt(argc, argv, "l:puvk:bt:h")) >= 0) {
 		switch (c) {
 			case 'v': {
 				opt->output_old = 1;
@@ -113,9 +205,6 @@ int prophex_query(int argc, char *argv[]) {
 				break;
 			case 'k':
 				opt->kmer_length = atoi(optarg);
-				break;
-			case 's':
-				opt->skip_after_fail = 1;
 				break;
 			case 'p':
 				opt->skip_positions_on_border = 0;
@@ -333,6 +422,8 @@ int main(int argc, char *argv[]) {
 		ret = prophex_klcp(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "query") == 0)
 		ret = prophex_query(argc - 1, argv + 1);
+	else if (strcmp(argv[1], "filter") == 0)
+		ret = prophex_filter(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "index") == 0)
 		ret = prophex_index(argc - 1, argv + 1);
 	else if (strcmp(argv[1], "bwtdowngrade") == 0)

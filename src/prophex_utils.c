@@ -17,5 +17,11 @@ prophex_opt_t* prophex_init_opt() {
 	o->need_log = 0;
 	o->log_file_name = NULL;
 	o->read_chunk_size = READ_CHUNK_SIZE;
+
+	o->is_query = 1;
+	o->match_proportion = 0.3;
+	o->match_number = 0;
+	o->passed_reads_file_name = NULL;
+	o->filtered_reads_file_name = NULL;
 	return o;
 }
