@@ -92,8 +92,8 @@ static int usage_filter(int threads) {
 	fprintf(stderr, "         -t INT    number of threads [%d]\n", threads);
 	fprintf(stderr, "         -m FLOAT  keep only reads with proportion of matches >= FLOAT [0.3]\n");
 	fprintf(stderr, "         -n INT    keep only reads with number of matches >= INT (ignored if -m is set)\n");
-	fprintf(stderr, "         -o        prefix for fastq for passing reads\n");
-	fprintf(stderr, "         -f        prefix for fastq for filtered reads\n");
+	fprintf(stderr, "         -1        output fastq for passing reads\n");
+	fprintf(stderr, "         -0        output fastq for filtered reads\n");
 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
 	return 1;
@@ -124,7 +124,7 @@ int prophex_filter(int argc, char *argv[]) {
 	opt->is_query = 0;
 	int m_set = 0;
 	int n_set = 0;
-	while ((c = getopt(argc, argv, "l:puvk:bt:hm:n:o:f:")) >= 0) {
+	while ((c = getopt(argc, argv, "l:puvk:bt:hm:n:1:0:")) >= 0) {
 		switch (c) {
 			case 'u':
 				opt->use_klcp = 1;
@@ -154,10 +154,10 @@ int prophex_filter(int argc, char *argv[]) {
 				opt->match_number = atoi(optarg);
 				n_set = 1;
 				break;
-			case 'o':
+			case '1':
 				opt->passed_reads_file_name = optarg;
 				break;
-			case 'f':
+			case '0':
 				opt->filtered_reads_file_name = optarg;
 				break;
 			default:
