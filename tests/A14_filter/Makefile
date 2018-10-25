@@ -9,11 +9,11 @@ N=1 5 10
 all: $(addprefix m,$M) $(addprefix n,$N)
 
 m%: _index.%.complete
-	$(IND) filter -k $(K) -u -m $* _index.$*.fa $(FQ) > _obtained.$*.txt
+	$(IND) filter -k $(K) -u -m $* -0 _filtered.$*.fq -1 _passed.$*.fq _index.$*.fa $(FQ) > _obtained.$*.txt
 	diff -c _obtained.$*.txt expected.$*.txt
 
 n%: _index.%.complete
-	$(IND) filter -k $(K) -u -n $* _index.$*.fa $(FQ) > _obtained.$*.txt
+	$(IND) filter -k $(K) -u -n $* -0 _filtered.$*.fq -1 _passed.$*.fq _index.$*.fa $(FQ) > _obtained.$*.txt
 	diff -c _obtained.$*.txt expected.$*.txt
 
 _index.%.complete:

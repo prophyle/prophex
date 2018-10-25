@@ -510,18 +510,18 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs, const pro
 				if (prophex_worker->passed[i]) {
 					fprintf(stdout, "C");
 					if (opt->passed_reads_file_name) {
-						fprintf(passed_reads_file, "%s\n", seq->name);
+						fprintf(passed_reads_file, "@%s\n", seq->name);
 						print_read(passed_reads_file, seq);
-						fprintf(passed_reads_file, "\n");
+						fprintf(passed_reads_file, "\n+\n");
 						print_read_qual(passed_reads_file, seq);
 						fprintf(passed_reads_file, "\n");
 					}
 				} else {
 					fprintf(stdout, "U");
 					if (opt->filtered_reads_file_name) {
-						fprintf(filtered_reads_file, "%s\n%d\n", seq->name, seq->l_seq);
+						fprintf(filtered_reads_file, "%s\n", seq->name);
 						print_read(filtered_reads_file, seq);
-						fprintf(filtered_reads_file, "\n");
+						fprintf(filtered_reads_file, "\n+\n");
 						print_read_qual(filtered_reads_file, seq);
 						fprintf(filtered_reads_file, "\n");
 					}
