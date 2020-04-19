@@ -18,16 +18,16 @@ typedef struct {
 	uint64_t position;
 	int strand;
 	int rid;
-	int node;
+	int kmerset;
 } bwt_position_t;
 
 typedef struct {
 	bwt_position_t* positions;
 	char* all_streaks;
 	char* current_streak;
-	int32_t* seen_nodes;
-	int32_t* prev_seen_nodes;
-	int8_t* seen_nodes_marks;
+	int32_t* seen_kmersets;
+	int32_t* prev_seen_kmersets;
+	int8_t* seen_kmersets_marks;
 	int rids_computations;
 	int using_prev_rids;
 } prophex_query_aux_t;
