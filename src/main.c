@@ -27,7 +27,7 @@ static int usage() {
 	fprintf(stderr, "Program: prophex (a lossless k-mer index)\n");
 	fprintf(stderr, "Version: %s\n", VERSION);
 	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
-	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
+	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr, karel.brinda@gmail.com\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex <command> [options]\n");
 	fprintf(stderr, "\n");
