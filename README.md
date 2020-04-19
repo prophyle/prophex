@@ -115,19 +115,20 @@ Usage:   prophex bwt2fa <idxbase> <output.fa>
 
 ## Output format
 
-Matches are reported in an extended
-[Kraken format](http://ccb.jhu.edu/software/kraken/MANUAL.html#output-format).
-ProPhex produces a tab-delimited file with the following columns:
+Matches are reported in the form of a tab-delimited file with the following
+columns:
 
-1. Category (unused, `U` as a legacy value)
-2. Sequence name
-3. Final decision (unused, `0` as a legacy value)
-4. Sequence length
-5. Assigned k-mers. Space-delimited list of k-mer blocks with the same assignments. The list is of
-   the following format: comma-delimited list of sets (or `A` for ambiguous, or
-   `0` for no matches), colon, length. Example: `2157,393595:1 393595:1 0:16` (the first k-mer assigned to the nodes `2157` and `393595`, the second k-mer assigned to `393595`, the subsequent 16 k-mers unassigned)
-6. Bases (optional)
-7. Base qualities (optional)
+1. Sequence name
+2. Sequence length
+3. Assigned k-mers. Space-delimited list of k-mer blocks matching the same
+   k-mer sets. The list is of the following format: comma-delimited list of
+   k-mer sets (`~` for an ambiguous nucleotide name `*` for no k-mer matches),
+   colon, the number of k-mers in the block. Example: `2157,393595:1 393595:1
+   *:16` (the first k-mer assigned to the k-mer sets `2157` and `393595`, the
+   second k-mer assigned to `393595`, and the subsequent 16 k-mers do not match
+   anything)
+4. Bases (optional)
+5. Base qualities (optional)
 
 
 ## FAQs

@@ -14,6 +14,9 @@
 #include "klcp.h"
 #include "prophex_utils.h"
 
+#define CONTAINS_AMBIG_NUCL "~"
+#define NO_MATCH "*"
+
 typedef struct {
 	uint64_t position;
 	int strand;

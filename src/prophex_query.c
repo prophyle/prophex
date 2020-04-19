@@ -154,7 +154,7 @@ void construct_streaks(char** all_streaks, char** current_streak, int* seen_kmer
 	*current_streak[0] = '\0';
 	int current_streak_approximate_length = 0;
 	if (is_ambiguous_streak) {
-		strcat(*current_streak, "A:");
+		strcat(*current_streak, CONTAINS_AMBIG_NUCL ":");
 		current_streak_approximate_length += 2;
 	} else if (kmersets_cnt > 0) {
 		int r;
@@ -167,7 +167,7 @@ void construct_streaks(char** all_streaks, char** current_streak, int* seen_kmer
 		                   get_kmerset_name_length(seen_kmersets[kmersets_cnt - 1]), MAX_SOFT_STREAK_LENGTH);
 		strncat_with_check(*current_streak, ":", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 	} else {
-		strncat_with_check(*current_streak, "0:", &current_streak_approximate_length, 2, MAX_SOFT_STREAK_LENGTH);
+		strncat_with_check(*current_streak, NO_MATCH ":", &current_streak_approximate_length, 2, MAX_SOFT_STREAK_LENGTH);
 	}
 	sprintf(*current_streak + strlen(*current_streak), "%d", streak_size);
 	current_streak_approximate_length += 3;
@@ -458,7 +458,7 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs, const pro
 	for (i = 0; i < n_seqs; ++i) {
 		bseq1_t* seq = seqs + i;
 		if (opt->output) {
-			fprintf(stdout, "U\t%s\t0\t%d\t", seq->name, seq->l_seq);
+			fprintf(stdout, "%s\t%d\t", seq->name, seq->l_seq);
 			print_streaks(prophex_worker->output[i]);
 			if (opt->output_read_qual) {
 				fprintf(stdout, "\t");
