@@ -1,4 +1,5 @@
 #include "prophex_utils.h"
+
 #include <stdlib.h>
 
 prophex_opt_t* prophex_init_opt() {

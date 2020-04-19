@@ -1,4 +1,5 @@
 #include "bitarray.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 

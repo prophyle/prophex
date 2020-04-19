@@ -1,7 +1,9 @@
 #include "prophex_query.h"
+
 #include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
+
 #include "bwa.h"
 #include "bwa_utils.h"
 #include "bwase.h"
@@ -94,8 +96,8 @@ void sort(int count, int** array) {
 	}
 }
 
-size_t get_kmersets_from_positions(const bwaidx_t* idx, const int query_length, const int positions_cnt, bwt_position_t* positions, int32_t* seen_kmersets,
-                                int8_t** seen_kmersets_marks, int skip_positions_on_border) {
+size_t get_kmersets_from_positions(const bwaidx_t* idx, const int query_length, const int positions_cnt, bwt_position_t* positions,
+                                   int32_t* seen_kmersets, int8_t** seen_kmersets_marks, int skip_positions_on_border) {
 	size_t kmersets_cnt = 0;
 	int i;
 	for (i = 0; i < positions_cnt; ++i) {
@@ -159,8 +161,8 @@ void construct_streaks(char** all_streaks, char** current_streak, int* seen_kmer
 	} else if (kmersets_cnt > 0) {
 		int r;
 		for (r = 0; r < kmersets_cnt - 1; ++r) {
-			strncat_with_check(*current_streak, get_kmerset_name(seen_kmersets[r]), &current_streak_approximate_length, get_kmerset_name_length(seen_kmersets[r]),
-			                   MAX_SOFT_STREAK_LENGTH);
+			strncat_with_check(*current_streak, get_kmerset_name(seen_kmersets[r]), &current_streak_approximate_length,
+			                   get_kmerset_name_length(seen_kmersets[r]), MAX_SOFT_STREAK_LENGTH);
 			strncat_with_check(*current_streak, ",", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 		}
 		strncat_with_check(*current_streak, get_kmerset_name(seen_kmersets[kmersets_cnt - 1]), &current_streak_approximate_length,
@@ -365,8 +367,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 				}
 				if (end_pos - last_ambiguous_index < opt->kmer_length) {
 					if (!is_ambiguous_streak) {
-						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+						                  is_ambiguous_streak, &is_first_streak);
 						is_ambiguous_streak = 1;
 						current_streak_size = 1;
 					} else {
@@ -376,8 +378,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 					continue;
 				} else {
 					if (is_ambiguous_streak && current_streak_size > 0) {
-						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+						                  is_ambiguous_streak, &is_first_streak);
 						is_ambiguous_streak = 0;
 						current_streak_size = 0;
 					}
@@ -415,8 +417,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 					aux_data.rids_computations++;
 					positions_cnt = get_positions(idx, aux_data.positions, opt->kmer_length, k, l);
 				}
-				kmersets_cnt = get_kmersets_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_kmersets, &seen_kmersets_marks,
-				                                     opt->skip_positions_on_border);
+				kmersets_cnt = get_kmersets_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_kmersets,
+				                                           &seen_kmersets_marks, opt->skip_positions_on_border);
 			}
 			if (opt->output_old) {
 				output_old(seen_kmersets, kmersets_cnt);
@@ -424,8 +426,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 				if (start_pos == 0 || ambiguous_streak_just_ended || (equal(kmersets_cnt, seen_kmersets, prev_kmersets_count, prev_seen_kmersets))) {
 					current_streak_size++;
 				} else {
-					construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size, is_ambiguous_streak,
-					                  &is_first_streak);
+					construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+					                  is_ambiguous_streak, &is_first_streak);
 					current_streak_size = 1;
 				}
 			}

@@ -1,7 +1,9 @@
 #include "klcp.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "utils.h"
 
 int32_t position_of_smallest_zero_bit[MAX_BITARRAY_BLOCK_VALUE + 1];

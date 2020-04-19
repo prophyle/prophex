@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "bwa.h"
 #include "bwa_utils.h"
 #include "prophex_build.h"

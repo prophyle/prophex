@@ -1,7 +1,9 @@
 #include "prophex_build.h"
+
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "bwa_utils.h"
 #include "bwt.h"
 #include "klcp.h"

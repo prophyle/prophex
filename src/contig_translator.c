@@ -1,7 +1,9 @@
 #include "contig_translator.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "utils.h"
 
 #define MAX_KMERSETS_COUNT 100000

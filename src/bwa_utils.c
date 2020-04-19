@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include "bwa.h"
 #include "contig_translator.h"
 #include "khash.h"

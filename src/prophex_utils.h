@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "bwtaln.h"
 
 // maximum total number base pairs in reads in one chunk

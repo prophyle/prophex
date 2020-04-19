@@ -8,6 +8,7 @@
 #define PROPHEX_QUERY_H
 
 #include <stdint.h>
+
 #include "bwa.h"
 #include "bwt.h"
 #include "bwtaln.h"
