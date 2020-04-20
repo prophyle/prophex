@@ -49,19 +49,19 @@ conda install prophex
 USAGE-BEGIN
 -->
 ```
-Program: prophex (a lossless k-mer index)
-Version: 0.1.1
+Program: prophex (an exact k-mer index)
+Version: 0.2.0
 Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
-Contact: kamil.salikhov@univ-mlv.fr
+Contact: kamil.salikhov@univ-mlv.fr, karel.brinda@gmail.com
 
 Usage:   prophex <command> [options]
 
-Command: index           construct a BWA index and k-LCP
-         query           query reads against index
+Command: index           index sequences in the FASTA format
+         query           query k-mers
 
-         klcp            construct an additional k-LCP
-         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ
-         bwt2fa          reconstruct FASTA from BWT
+         klcp            construct an additional k-LCP array
+         bwtdowngrade    remove OCC from .bwt
+         bwt2fa          reconstruct .fa from .fa.bwt
 
 ```
 
@@ -77,11 +77,9 @@ Options: -k INT    k-mer length for k-LCP
 ```
 Usage:   prophex query [options] <idxbase> <in.fq>
 
-Options: -k INT    length of k-mer
+Options: -k INT    k-mer length
          -u        use k-LCP for querying
-         -v        output set of chromosomes for every k-mer
-         -p        do not check whether k-mer is on border of two contigs, and show such k-mers in output
-         -b        print sequences and base qualities
+         -b        append sequences and base qualities to the output
          -l STR    log file name to output statistics
          -t INT    number of threads [1]
          -h        print help message
@@ -91,8 +89,8 @@ Options: -k INT    length of k-mer
 ```
 Usage:   prophex klcp [options] <idxbase>
 
-Options: -k INT    length of k-mer
-         -s        construct k-LCP and SA in parallel
+Options: -k INT    k-mer length
+         -s        construct also SA, in parallel to k-LCP
          -i        sampling distance for SA
          -h        print help message
 
