@@ -350,7 +350,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 	if (start_pos + opt->kmer_length > seq.l_seq) {
 		if (opt->output) {
 			prophex_worker->output[seq_index] = malloc(5 * sizeof(char));
-			strncpy(prophex_worker->output[seq_index], "0:0", 5);
+			strncpy(prophex_worker->output[seq_index], NO_MATCH ":0", 5);
 		}
 	} else {
 		int index = 0;
