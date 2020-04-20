@@ -359,8 +359,15 @@ void process_sequence(void* data, int seq_index, int tid) {
 				last_ambiguous_index = index;
 			}
 		}
+		/*
+			Iterate through the current query sequence
+		*/
 		while (start_pos + opt->kmer_length <= seq.l_seq) {
 			int end_pos = start_pos + opt->kmer_length - 1;
+			/*
+				1. Treat ambiguous nucleotides in queries if the current k-mer window contains any
+				   (-> ambiguous streaks)
+			*/
 			if (opt->output) {
 				if (start_pos > 0 && seq.seq[end_pos] > 3) {
 					last_ambiguous_index = end_pos;
@@ -395,6 +402,10 @@ void process_sequence(void* data, int seq_index, int tid) {
 					ambiguous_streak_just_ended = 0;
 				}
 			}
+
+			/*
+				2. Update SA interval [k,l)
+			*/
 			if (start_pos == 0 || ambiguous_streak_just_ended) {
 				k = 0;
 				l = 0;
@@ -408,18 +419,29 @@ void process_sequence(void* data, int seq_index, int tid) {
 					calculate_sa_interval_restart(bwt, opt->kmer_length, seq.seq, &k, &l, start_pos);
 				}
 			}
+
+			/*
+				3. Translate: SA interval -> genomic coordinates -> k-mer set names
+			*/
 			int kmersets_cnt = 0;
 			if (k <= l) {
 				if (prev_l - prev_k == l - k && increased_l - decreased_k == l - k) {
+					/* SA interval length hasn't changed -> just increment coordinates */
 					aux_data.using_prev_rids++;
 					shift_positions_by_one(idx, positions_cnt, aux_data.positions, opt->kmer_length, k, l);
 				} else {
+					/* SA interval length hasn changed -> recalculate coordinates */
 					aux_data.rids_computations++;
 					positions_cnt = get_positions(idx, aux_data.positions, opt->kmer_length, k, l);
 				}
+				/* coordinates -> k-mer set names */
 				kmersets_cnt = get_kmersets_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_kmersets,
 				                                           &seen_kmersets_marks, opt->skip_positions_on_border);
 			}
+
+			/*
+				4. Increment streak length or create a new one
+			*/
 			if (opt->output_old) {
 				output_old(seen_kmersets, kmersets_cnt);
 			} else if (opt->output) {
@@ -438,11 +460,14 @@ void process_sequence(void* data, int seq_index, int tid) {
 			prev_k = k;
 			prev_l = l;
 			start_pos++;
-		}
+		} // while (start_pos + opt->kmer_length <= seq.l_seq)
+
 		if (current_streak_size > 0) {
 			construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size, is_ambiguous_streak,
 			                  &is_first_streak);
 		}
+
+		/* Add k-mer matches of the current query sequence to the worker buffer. */
 		if (opt->output) {
 			size_t all_streaks_length = strlen(all_streaks);
 			prophex_worker->output[seq_index] = malloc((all_streaks_length + 1) * sizeof(char));
