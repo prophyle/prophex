@@ -11,6 +11,24 @@ designed as a core computational component of
 classifier allowing fast and accurate read assignment.
 
 
+<!-- vim-markdown-toc GFM -->
+
+* [Getting started](#getting-started)
+  * [Alternative ways of installation](#alternative-ways-of-installation)
+* [Quick example](#quick-example)
+* [ProPhex commands](#prophex-commands)
+* [Output format](#output-format)
+* [FAQs](#faqs)
+* [Issues](#issues)
+* [Changelog](#changelog)
+* [Licence](#licence)
+* [Authors](#authors)
+
+<!-- vim-markdown-toc -->
+
+
+
+
 ## Getting started
 
 ```
@@ -44,7 +62,7 @@ conda install prophex
 
 
 
-# ProPhex commands
+## ProPhex commands
 <!---
 USAGE-BEGIN
 -->
