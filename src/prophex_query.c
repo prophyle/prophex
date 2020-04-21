@@ -30,14 +30,20 @@ int calculate_sa_interval(const bwt_t* bwt, int len, const ubyte_t* str, uint64_
 		if (c > 3) {
 			*k = 1;
 			*l = 0;
+			fprintf(stderr, "[prophex:%s .1] i=%d c=%" PRIu64 " k=%" PRIu64 " l=%" PRIu64 " l-k=%" PRIi64 "\n",
+					__func__, i, (uint64_t) c, *k, *l, (int64_t)(*l) - (int64_t)(*k));
 			return i - start_pos;
 		}
 		if (c < 4) {
 			bwt_2occ(bwt, *k - 1, *l, c, &ok, &ol);
 			*k = bwt->L2[c] + ok + 1;
 			*l = bwt->L2[c] + ol;
+			fprintf(stderr, "[prophex:%s .1] i=%d c=%" PRIu64 " k=%" PRIu64 " l=%" PRIu64 " l-k=%" PRIi64 "\n",
+					__func__, i, (uint64_t) c, *k, *l, (int64_t)(*l) - (int64_t)(*k));
 		}
 		if (*k > *l) {
+			fprintf(stderr, "[prophex:%s .1] i=%d c=%" PRIu64 " k=%" PRIu64 " l=%" PRIu64 " l-k=%" PRIi64 "\n",
+					__func__, i, (uint64_t) c, *k, *l, (int64_t)(*l) - (int64_t)(*k));
 			return i - start_pos;
 		}
 	}
