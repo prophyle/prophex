@@ -405,6 +405,7 @@ int main_fastmap(int argc, char *argv[])
 	itr = smem_itr_init(idx->bwt);
 	smem_config(itr, min_intv, max_len, max_intv);
 	while (kseq_read(seq) >= 0) {
+		double t_real_seq = realtime();
 		err_printf("SQ\t%s\t%ld", seq->name.s, seq->seq.l);
 		if (print_seq) {
 			err_putchar('\t');
@@ -433,6 +434,7 @@ int main_fastmap(int argc, char *argv[])
 			}
 		}
 		err_puts("//");
+		fprintf(stderr, "       [fastmap: sequence %s] Real time: %.3f sec\n", seq->name.s, realtime() - t_real_seq);
 	}
 
 	smem_itr_destroy(itr);

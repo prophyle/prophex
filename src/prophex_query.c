@@ -311,6 +311,7 @@ void prophex_worker_destroy(prophex_worker_t* prophex_worker) {
 }
 
 void process_sequence(void* data, int seq_index, int tid) {
+	double t_real_seq = realtime();
 	prophex_worker_t* prophex_worker = (prophex_worker_t*)data;
 	const bwaidx_t* idx = prophex_worker->idx;
 	bseq1_t seq = prophex_worker->seqs[seq_index];
@@ -447,6 +448,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 			strncpy(prophex_worker->output[seq_index], all_streaks, all_streaks_length + 1);
 		}
 	}
+	fprintf(stderr, "       [prophex: sequence %s] Real time: %.3f sec\n", seq.name, realtime() - t_real_seq);
 }
 
 void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs, const prophex_opt_t* opt, const klcp_t* klcp) {
