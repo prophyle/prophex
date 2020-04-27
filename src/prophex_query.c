@@ -77,6 +77,8 @@ size_t get_positions(const bwaidx_t* idx, bwt_position_t* positions, const int q
 		positions[t - k].position = pos;
 		positions[t - k].strand = strand;
 		positions[t - k].rid = -1;
+		fprintf(stderr, "[prophex:%s] i=%" PRIu64 " t=%" PRIu64 " pos=%" PRIu64 "\n",
+			__func__, t-k, t, pos);
 	}
 	return (l - k + 1 < MAX_POSSIBLE_SA_POSITIONS ? l - k + 1 : MAX_POSSIBLE_SA_POSITIONS);
 }
