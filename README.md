@@ -163,7 +163,7 @@ See [Releases](https://github.com/prophyle/prophex/releases).
 
 Kamil Salikhov \<salikhov.kamil@gmail.com\>
 
-[Karel Brinda](http://brinda.cz) \<kbrinda@hsph.harvard.edu\>
+[Karel Brinda](http://brinda.eu) \<karel.brinda@inria.fr\>
 
 Simone Pignotti \<pignottisimone@gmail.com\>
 
