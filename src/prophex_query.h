@@ -40,6 +40,7 @@ typedef struct {
 	prophex_query_aux_t* aux_data;
 	int32_t seqs_cnt;
 	char** output;
+	int* passed;
 } prophex_worker_t;
 
 void query(const char* prefix, const char* fn_fa, const prophex_opt_t* opt);

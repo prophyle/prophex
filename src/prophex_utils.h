@@ -15,20 +15,33 @@
 #define READ_CHUNK_SIZE 10000000
 
 typedef struct {
+	// BWA options
 	int mode;
-	int n_threads;
 	int trim_qual;
+
+	// Index options
+	int construct_sa_parallel;
+
+	// Common query and filter options
+	int is_query;
+	int n_threads;
 	int use_klcp;
 	int kmer_length;
 	int output;
-	int output_old;
 	int output_read_qual;
-	int skip_after_fail;
 	int skip_positions_on_border;
 	int need_log;
 	char* log_file_name;
-	int construct_sa_parallel;
 	int read_chunk_size;
+
+	// Query options
+	int output_old;
+
+	// Filter options
+	double match_proportion;
+	int match_number;
+	char* passed_reads_file_name;
+	char* filtered_reads_file_name;
 } prophex_opt_t;
 
 prophex_opt_t* prophex_init_opt();
