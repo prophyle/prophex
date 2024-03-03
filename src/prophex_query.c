@@ -1,11 +1,13 @@
 #include "prophex_query.h"
+
 #include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
+
 #include "bwa.h"
 #include "bwa_utils.h"
 #include "bwase.h"
-#include "contig_node_translator.h"
+#include "contig_translator.h"
 #include "klcp.h"
 #include "kseq.h"
 #include "kstring.h"
@@ -94,9 +96,9 @@ void sort(int count, int** array) {
 	}
 }
 
-size_t get_nodes_from_positions(const bwaidx_t* idx, const int query_length, const int positions_cnt, bwt_position_t* positions, int32_t* seen_nodes,
-                                int8_t** seen_nodes_marks, int skip_positions_on_border) {
-	size_t nodes_cnt = 0;
+size_t get_kmersets_from_positions(const bwaidx_t* idx, const int query_length, const int positions_cnt, bwt_position_t* positions,
+                                   int32_t* seen_kmersets, int8_t** seen_kmersets_marks, int skip_positions_on_border) {
+	size_t kmersets_cnt = 0;
 	int i;
 	for (i = 0; i < positions_cnt; ++i) {
 		uint64_t pos = positions[i].position;
@@ -108,28 +110,28 @@ size_t get_nodes_from_positions(const bwaidx_t* idx, const int query_length, con
 			rid = bns_pos2rid(idx->bns, pos);
 			positions[i].rid = rid;
 		}
-		int node = get_node_from_contig(rid);
-		positions[i].node = node;
-		int seen = (*seen_nodes_marks)[node];
-		if (!seen && node != -1 && (!skip_positions_on_border || !is_position_on_border(idx, &(positions[i]), query_length))) {
-			seen_nodes[nodes_cnt] = node;
-			++nodes_cnt;
-			(*seen_nodes_marks)[node] = 1;
+		int kmerset = get_kmerset_from_contig(rid);
+		positions[i].kmerset = kmerset;
+		int seen = (*seen_kmersets_marks)[kmerset];
+		if (!seen && kmerset != -1 && (!skip_positions_on_border || !is_position_on_border(idx, &(positions[i]), query_length))) {
+			seen_kmersets[kmersets_cnt] = kmerset;
+			++kmersets_cnt;
+			(*seen_kmersets_marks)[kmerset] = 1;
 		}
 	}
 	int r;
-	for (r = 0; r < nodes_cnt; ++r) {
-		(*seen_nodes_marks)[seen_nodes[r]] = 0;
+	for (r = 0; r < kmersets_cnt; ++r) {
+		(*seen_kmersets_marks)[seen_kmersets[r]] = 0;
 	}
-	sort(nodes_cnt, &seen_nodes);
-	return nodes_cnt;
+	sort(kmersets_cnt, &seen_kmersets);
+	return kmersets_cnt;
 }
 
-void output_old(int* seen_nodes, const int nodes_cnt) {
-	fprintf(stdout, "%d ", nodes_cnt);
+void output_old(int* seen_kmersets, const int kmersets_cnt) {
+	fprintf(stdout, "%d ", kmersets_cnt);
 	int r;
-	for (r = 0; r < nodes_cnt; ++r) {
-		fprintf(stdout, "%s ", get_node_name(seen_nodes[r]));
+	for (r = 0; r < kmersets_cnt; ++r) {
+		fprintf(stdout, "%s ", get_kmerset_name(seen_kmersets[r]));
 	}
 	fprintf(stdout, "\n");
 }
@@ -146,7 +148,7 @@ void strncat_with_check(char* str, char* str_to_append, int* str_length, int str
 	}
 }
 
-void construct_streaks(char** all_streaks, char** current_streak, int* seen_nodes, int nodes_cnt, int streak_size, int is_ambiguous_streak,
+void construct_streaks(char** all_streaks, char** current_streak, int* seen_kmersets, int kmersets_cnt, int streak_size, int is_ambiguous_streak,
                        int* is_first_streak) {
 	if (*is_first_streak) {
 		*all_streaks[0] = '\0';
@@ -154,20 +156,20 @@ void construct_streaks(char** all_streaks, char** current_streak, int* seen_node
 	*current_streak[0] = '\0';
 	int current_streak_approximate_length = 0;
 	if (is_ambiguous_streak) {
-		strcat(*current_streak, "A:");
+		strcat(*current_streak, CONTAINS_AMBIG_NUCL ":");
 		current_streak_approximate_length += 2;
-	} else if (nodes_cnt > 0) {
+	} else if (kmersets_cnt > 0) {
 		int r;
-		for (r = 0; r < nodes_cnt - 1; ++r) {
-			strncat_with_check(*current_streak, get_node_name(seen_nodes[r]), &current_streak_approximate_length, get_node_name_length(seen_nodes[r]),
-			                   MAX_SOFT_STREAK_LENGTH);
+		for (r = 0; r < kmersets_cnt - 1; ++r) {
+			strncat_with_check(*current_streak, get_kmerset_name(seen_kmersets[r]), &current_streak_approximate_length,
+			                   get_kmerset_name_length(seen_kmersets[r]), MAX_SOFT_STREAK_LENGTH);
 			strncat_with_check(*current_streak, ",", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 		}
-		strncat_with_check(*current_streak, get_node_name(seen_nodes[nodes_cnt - 1]), &current_streak_approximate_length,
-		                   get_node_name_length(seen_nodes[nodes_cnt - 1]), MAX_SOFT_STREAK_LENGTH);
+		strncat_with_check(*current_streak, get_kmerset_name(seen_kmersets[kmersets_cnt - 1]), &current_streak_approximate_length,
+		                   get_kmerset_name_length(seen_kmersets[kmersets_cnt - 1]), MAX_SOFT_STREAK_LENGTH);
 		strncat_with_check(*current_streak, ":", &current_streak_approximate_length, 1, MAX_SOFT_STREAK_LENGTH);
 	} else {
-		strncat_with_check(*current_streak, "0:", &current_streak_approximate_length, 2, MAX_SOFT_STREAK_LENGTH);
+		strncat_with_check(*current_streak, NO_MATCH ":", &current_streak_approximate_length, 2, MAX_SOFT_STREAK_LENGTH);
 	}
 	sprintf(*current_streak + strlen(*current_streak), "%d", streak_size);
 	current_streak_approximate_length += 3;
@@ -246,12 +248,12 @@ prophex_worker_t* prophex_worker_init(const bwaidx_t* idx, int32_t seqs_cnt, con
 		prophex_worker->aux_data[tid].positions = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(bwt_position_t));
 		prophex_worker->aux_data[tid].all_streaks = malloc(MAX_STREAK_LENGTH * sizeof(char));
 		prophex_worker->aux_data[tid].current_streak = malloc(MAX_STREAK_LENGTH * sizeof(char));
-		prophex_worker->aux_data[tid].seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
-		prophex_worker->aux_data[tid].prev_seen_nodes = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
-		prophex_worker->aux_data[tid].seen_nodes_marks = malloc(idx->bns->n_seqs * sizeof(int8_t));
+		prophex_worker->aux_data[tid].seen_kmersets = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
+		prophex_worker->aux_data[tid].prev_seen_kmersets = malloc(MAX_POSSIBLE_SA_POSITIONS * sizeof(int32_t));
+		prophex_worker->aux_data[tid].seen_kmersets_marks = malloc(idx->bns->n_seqs * sizeof(int8_t));
 		int index;
 		for (index = 0; index < idx->bns->n_seqs; ++index) {
-			prophex_worker->aux_data[tid].seen_nodes_marks[index] = 0;
+			prophex_worker->aux_data[tid].seen_kmersets_marks[index] = 0;
 		}
 		prophex_worker->aux_data[tid].rids_computations = 0;
 		prophex_worker->aux_data[tid].using_prev_rids = 0;
@@ -275,14 +277,14 @@ void prophex_aux_data_destroy(prophex_query_aux_t* prophex_query_aux_data) {
 	if (prophex_query_aux_data->current_streak) {
 		free(prophex_query_aux_data->current_streak);
 	}
-	if (prophex_query_aux_data->seen_nodes) {
-		free(prophex_query_aux_data->seen_nodes);
+	if (prophex_query_aux_data->seen_kmersets) {
+		free(prophex_query_aux_data->seen_kmersets);
 	}
-	if (prophex_query_aux_data->prev_seen_nodes) {
-		free(prophex_query_aux_data->prev_seen_nodes);
+	if (prophex_query_aux_data->prev_seen_kmersets) {
+		free(prophex_query_aux_data->prev_seen_kmersets);
 	}
-	if (prophex_query_aux_data->seen_nodes_marks) {
-		free(prophex_query_aux_data->seen_nodes_marks);
+	if (prophex_query_aux_data->seen_kmersets_marks) {
+		free(prophex_query_aux_data->seen_kmersets_marks);
 	}
 }
 
@@ -319,9 +321,9 @@ void process_sequence(void* data, int seq_index, int tid) {
 	prophex_query_aux_t aux_data = prophex_worker->aux_data[tid];
 	char* current_streak = aux_data.current_streak;
 	char* all_streaks = aux_data.all_streaks;
-	int32_t* seen_nodes = aux_data.seen_nodes;
-	int32_t* prev_seen_nodes = aux_data.prev_seen_nodes;
-	int8_t* seen_nodes_marks = aux_data.seen_nodes_marks;
+	int32_t* seen_kmersets = aux_data.seen_kmersets;
+	int32_t* prev_seen_kmersets = aux_data.prev_seen_kmersets;
+	int8_t* seen_kmersets_marks = aux_data.seen_kmersets_marks;
 	int i;
 
 	for (i = 0; i < seq.l_seq; ++i)  // convert to 2-bit encoding if we have not done so
@@ -336,7 +338,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 	bwt_t* bwt = idx->bwt;
 	uint64_t k = 0, l = 0, prev_k = 1, prev_l = 0;
 	int current_streak_size = 0;
-	int prev_nodes_count = 0;
+	int prev_kmersets_count = 0;
 	int start_pos = 0;
 	size_t positions_cnt = 0;
 	uint64_t decreased_k = 1;
@@ -348,7 +350,7 @@ void process_sequence(void* data, int seq_index, int tid) {
 	if (start_pos + opt->kmer_length > seq.l_seq) {
 		if (opt->output) {
 			prophex_worker->output[seq_index] = malloc(5 * sizeof(char));
-			strncpy(prophex_worker->output[seq_index], "0:0", 5);
+			strncpy(prophex_worker->output[seq_index], NO_MATCH ":0", 5);
 		}
 	} else {
 		int index = 0;
@@ -357,16 +359,23 @@ void process_sequence(void* data, int seq_index, int tid) {
 				last_ambiguous_index = index;
 			}
 		}
+		/*
+			Iterate through the current query sequence
+		*/
 		while (start_pos + opt->kmer_length <= seq.l_seq) {
 			int end_pos = start_pos + opt->kmer_length - 1;
+			/*
+				1. Treat ambiguous nucleotides in queries if the current k-mer window contains any
+				   (-> ambiguous streaks)
+			*/
 			if (opt->output) {
 				if (start_pos > 0 && seq.seq[end_pos] > 3) {
 					last_ambiguous_index = end_pos;
 				}
 				if (end_pos - last_ambiguous_index < opt->kmer_length) {
 					if (!is_ambiguous_streak) {
-						construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+						                  is_ambiguous_streak, &is_first_streak);
 						is_ambiguous_streak = 1;
 						current_streak_size = 1;
 					} else {
@@ -376,8 +385,8 @@ void process_sequence(void* data, int seq_index, int tid) {
 					continue;
 				} else {
 					if (is_ambiguous_streak && current_streak_size > 0) {
-						construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-						                  &is_first_streak);
+						construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+						                  is_ambiguous_streak, &is_first_streak);
 						is_ambiguous_streak = 0;
 						current_streak_size = 0;
 					}
@@ -387,12 +396,16 @@ void process_sequence(void* data, int seq_index, int tid) {
 					l = 0;
 					prev_k = 1;
 					prev_l = 0;
-					prev_nodes_count = 0;
+					prev_kmersets_count = 0;
 					ambiguous_streak_just_ended = 1;
 				} else {
 					ambiguous_streak_just_ended = 0;
 				}
 			}
+
+			/*
+				2. Update SA interval [k,l)
+			*/
 			if (start_pos == 0 || ambiguous_streak_just_ended) {
 				k = 0;
 				l = 0;
@@ -406,41 +419,55 @@ void process_sequence(void* data, int seq_index, int tid) {
 					calculate_sa_interval_restart(bwt, opt->kmer_length, seq.seq, &k, &l, start_pos);
 				}
 			}
-			int nodes_cnt = 0;
+
+			/*
+				3. Translate: SA interval -> genomic coordinates -> k-mer set names
+			*/
+			int kmersets_cnt = 0;
 			if (k <= l) {
 				if (prev_l - prev_k == l - k && increased_l - decreased_k == l - k) {
+					/* SA interval length hasn't changed -> just increment coordinates */
 					aux_data.using_prev_rids++;
 					shift_positions_by_one(idx, positions_cnt, aux_data.positions, opt->kmer_length, k, l);
 				} else {
+					/* SA interval length hasn changed -> recalculate coordinates */
 					aux_data.rids_computations++;
 					positions_cnt = get_positions(idx, aux_data.positions, opt->kmer_length, k, l);
 				}
-				nodes_cnt = get_nodes_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_nodes, &seen_nodes_marks,
-				                                     opt->skip_positions_on_border);
+				/* coordinates -> k-mer set names */
+				kmersets_cnt = get_kmersets_from_positions(idx, opt->kmer_length, positions_cnt, aux_data.positions, seen_kmersets,
+				                                           &seen_kmersets_marks, opt->skip_positions_on_border);
 			}
+
+			/*
+				4. Increment streak length or create a new one
+			*/
 			if (opt->output_old) {
-				output_old(seen_nodes, nodes_cnt);
+				output_old(seen_kmersets, kmersets_cnt);
 			} else if (opt->output) {
-				if (start_pos == 0 || ambiguous_streak_just_ended || (equal(nodes_cnt, seen_nodes, prev_nodes_count, prev_seen_nodes))) {
+				if (start_pos == 0 || ambiguous_streak_just_ended || (equal(kmersets_cnt, seen_kmersets, prev_kmersets_count, prev_seen_kmersets))) {
 					current_streak_size++;
 				} else {
-					construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
-					                  &is_first_streak);
+					construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size,
+					                  is_ambiguous_streak, &is_first_streak);
 					current_streak_size = 1;
 				}
 			}
-			int* tmp = seen_nodes;
-			seen_nodes = prev_seen_nodes;
-			prev_seen_nodes = tmp;
-			prev_nodes_count = nodes_cnt;
+			int* tmp = seen_kmersets;
+			seen_kmersets = prev_seen_kmersets;
+			prev_seen_kmersets = tmp;
+			prev_kmersets_count = kmersets_cnt;
 			prev_k = k;
 			prev_l = l;
 			start_pos++;
-		}
+		} // while (start_pos + opt->kmer_length <= seq.l_seq)
+
 		if (current_streak_size > 0) {
-			construct_streaks(&all_streaks, &current_streak, prev_seen_nodes, prev_nodes_count, current_streak_size, is_ambiguous_streak,
+			construct_streaks(&all_streaks, &current_streak, prev_seen_kmersets, prev_kmersets_count, current_streak_size, is_ambiguous_streak,
 			                  &is_first_streak);
 		}
+
+		/* Add k-mer matches of the current query sequence to the worker buffer. */
 		if (opt->output) {
 			size_t all_streaks_length = strlen(all_streaks);
 			prophex_worker->output[seq_index] = malloc((all_streaks_length + 1) * sizeof(char));
@@ -458,7 +485,7 @@ void process_sequences(const bwaidx_t* idx, int n_seqs, bseq1_t* seqs, const pro
 	for (i = 0; i < n_seqs; ++i) {
 		bseq1_t* seq = seqs + i;
 		if (opt->output) {
-			fprintf(stdout, "U\t%s\t0\t%d\t", seq->name, seq->l_seq);
+			fprintf(stdout, "%s\t%d\t", seq->name, seq->l_seq);
 			print_streaks(prophex_worker->output[i]);
 			if (opt->output_read_qual) {
 				fprintf(stdout, "\t");

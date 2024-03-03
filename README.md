@@ -11,6 +11,24 @@ designed as a core computational component of
 classifier allowing fast and accurate read assignment.
 
 
+<!-- vim-markdown-toc GFM -->
+
+* [Getting started](#getting-started)
+  * [Alternative ways of installation](#alternative-ways-of-installation)
+* [Quick example](#quick-example)
+* [ProPhex commands](#prophex-commands)
+* [Output format](#output-format)
+* [FAQs](#faqs)
+* [Issues](#issues)
+* [Changelog](#changelog)
+* [Licence](#licence)
+* [Authors](#authors)
+
+<!-- vim-markdown-toc -->
+
+
+
+
 ## Getting started
 
 ```
@@ -44,24 +62,24 @@ conda install prophex
 
 
 
-# ProPhex commands
+## ProPhex commands
 <!---
 USAGE-BEGIN
 -->
 ```
-Program: prophex (a lossless k-mer index)
-Version: 0.1.1
+Program: prophex (an exact k-mer index)
+Version: 0.2.0
 Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov
-Contact: kamil.salikhov@univ-mlv.fr
+Contact: kamil.salikhov@univ-mlv.fr, karel.brinda@gmail.com
 
 Usage:   prophex <command> [options]
 
-Command: index           construct a BWA index and k-LCP
-         query           query reads against index
+Command: index           index sequences in the FASTA format
+         query           query k-mers
 
-         klcp            construct an additional k-LCP
-         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ
-         bwt2fa          reconstruct FASTA from BWT
+         klcp            construct an additional k-LCP array
+         bwtdowngrade    remove OCC from .bwt
+         bwt2fa          reconstruct .fa from .fa.bwt
 
 ```
 
@@ -77,11 +95,9 @@ Options: -k INT    k-mer length for k-LCP
 ```
 Usage:   prophex query [options] <idxbase> <in.fq>
 
-Options: -k INT    length of k-mer
+Options: -k INT    k-mer length
          -u        use k-LCP for querying
-         -v        output set of chromosomes for every k-mer
-         -p        do not check whether k-mer is on border of two contigs, and show such k-mers in output
-         -b        print sequences and base qualities
+         -b        append sequences and base qualities to the output
          -l STR    log file name to output statistics
          -t INT    number of threads [1]
          -h        print help message
@@ -91,8 +107,8 @@ Options: -k INT    length of k-mer
 ```
 Usage:   prophex klcp [options] <idxbase>
 
-Options: -k INT    length of k-mer
-         -s        construct k-LCP and SA in parallel
+Options: -k INT    k-mer length
+         -s        construct also SA, in parallel to k-LCP
          -i        sampling distance for SA
          -h        print help message
 
@@ -115,19 +131,20 @@ Usage:   prophex bwt2fa <idxbase> <output.fa>
 
 ## Output format
 
-Matches are reported in an extended
-[Kraken format](http://ccb.jhu.edu/software/kraken/MANUAL.html#output-format).
-ProPhex produces a tab-delimited file with the following columns:
+Matches are reported in the form of a tab-delimited file with the following
+columns:
 
-1. Category (unused, `U` as a legacy value)
-2. Sequence name
-3. Final decision (unused, `0` as a legacy value)
-4. Sequence length
-5. Assigned k-mers. Space-delimited list of k-mer blocks with the same assignments. The list is of
-   the following format: comma-delimited list of sets (or `A` for ambiguous, or
-   `0` for no matches), colon, length. Example: `2157,393595:1 393595:1 0:16` (the first k-mer assigned to the nodes `2157` and `393595`, the second k-mer assigned to `393595`, the subsequent 16 k-mers unassigned)
-6. Bases (optional)
-7. Base qualities (optional)
+1. Sequence name
+2. Sequence length
+3. Assigned k-mers. Space-delimited list of k-mer blocks matching the same
+   k-mer sets. The list is of the following format: comma-delimited list of
+   k-mer sets (`~` for an ambiguous nucleotide name `*` for no k-mer matches),
+   colon, the number of k-mers in the block. Example: `2157,393595:1 393595:1
+   *:16` (the first k-mer assigned to the k-mer sets `2157` and `393595`, the
+   second k-mer assigned to `393595`, and the subsequent 16 k-mers do not match
+   anything)
+4. Bases (optional)
+5. Base qualities (optional)
 
 
 ## FAQs

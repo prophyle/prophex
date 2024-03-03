@@ -7,7 +7,7 @@ IND=./prophex
 
 DEPS= $(wildcard src/*.h) $(wildcard src/*.c) $(wildcard src/bwa/.*.h) $(wildcard src/bwa/*.c)
 
-all: prophex readme
+all: prophex #readme
 
 prophex: $(DEPS)
 	$(MAKE) -C src

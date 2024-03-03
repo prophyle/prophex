@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include "bwa.h"
-#include "contig_node_translator.h"
+#include "contig_translator.h"
 #include "khash.h"
 #include "kstring.h"
 #include "prophex_utils.h"

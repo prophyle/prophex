@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "bwa.h"
 #include "bwa_utils.h"
 #include "prophex_build.h"
@@ -24,19 +25,19 @@
 
 static int usage() {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Program: prophex (a lossless k-mer index)\n");
+	fprintf(stderr, "Program: prophex (an exact k-mer index)\n");
 	fprintf(stderr, "Version: %s\n", VERSION);
 	fprintf(stderr, "Authors: Kamil Salikhov, Karel Brinda, Simone Pignotti, Gregory Kucherov\n");
-	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr\n");
+	fprintf(stderr, "Contact: kamil.salikhov@univ-mlv.fr, karel.brinda@gmail.com\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex <command> [options]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Command: index           construct a BWA index and k-LCP\n");
-	fprintf(stderr, "         query           query reads against index\n");
+	fprintf(stderr, "Command: index           index sequences in the FASTA format\n");
+	fprintf(stderr, "         query           query k-mers\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "         klcp            construct an additional k-LCP\n");
-	fprintf(stderr, "         bwtdowngrade    downgrade .bwt to the old, more compact format without Occ\n");
-	fprintf(stderr, "         bwt2fa          reconstruct FASTA from BWT\n");
+	fprintf(stderr, "         klcp            construct an additional k-LCP array\n");
+	fprintf(stderr, "         bwtdowngrade    remove OCC from .bwt\n");
+	fprintf(stderr, "         bwt2fa          reconstruct .fa from .fa.bwt\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -45,8 +46,8 @@ static int usage_klcp() {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex klcp [options] <idxbase>\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Options: -k INT    length of k-mer\n");
-	fprintf(stderr, "         -s        construct k-LCP and SA in parallel\n");
+	fprintf(stderr, "Options: -k INT    k-mer length\n");
+	fprintf(stderr, "         -s        construct also SA, in parallel to k-LCP\n");
 	fprintf(stderr, "         -i        sampling distance for SA\n");
 	fprintf(stderr, "         -h        print help message\n");
 	fprintf(stderr, "\n");
@@ -84,11 +85,11 @@ static int usage_query(int threads) {
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage:   prophex query [options] <idxbase> <in.fq>\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Options: -k INT    length of k-mer\n");
+	fprintf(stderr, "Options: -k INT    k-mer length\n");
 	fprintf(stderr, "         -u        use k-LCP for querying\n");
-	fprintf(stderr, "         -v        output set of chromosomes for every k-mer\n");
-	fprintf(stderr, "         -p        do not check whether k-mer is on border of two contigs, and show such k-mers in output\n");
-	fprintf(stderr, "         -b        print sequences and base qualities\n");
+	//fprintf(stderr, "         -v        output matching k-mer sets for every k-mer\n");
+	//fprintf(stderr, "         -p        do not check whether k-mer is on border of two contigs, and show such k-mers in output\n");
+	fprintf(stderr, "         -b        append sequences and base qualities to the output\n");
 	fprintf(stderr, "         -l STR    log file name to output statistics\n");
 	fprintf(stderr, "         -t INT    number of threads [%d]\n", threads);
 	fprintf(stderr, "         -h        print help message\n");
